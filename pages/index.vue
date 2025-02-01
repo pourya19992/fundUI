@@ -1,12 +1,12 @@
 <template>
+  <Header/>
   <div>
-    <Header />
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
       <!-- Heading -->
-      <h2 class="text-2xl font-iranSans text-center mb-4">صندوق درآمد ثابت</h2>
-      <p class="text-gray-700 text-center mb-8">سلام.</p>
+<!--      <h2 class="text-2xl font-iranSans text-center mb-4">صندوق درآمد ثابت</h2>-->
+<!--      <p class="text-gray-700 text-center mb-8">سلام.</p>-->
 
       <!-- Image Section -->
       <div class="mb-8">
@@ -40,22 +40,24 @@
       </div>
     </div>
 
-    <Footer />
   </div>
+  <Footer/>
 </template>
 
 <script setup>
-import { Carousel, Slide } from "vue3-carousel";
+import {Carousel, Slide} from "vue3-carousel";
 import "vue3-carousel/dist/carousel.css"; // استایل‌های مورد نیاز
 
 // ایمپورت تصاویر
 import slide1 from "~/assets/images/slide1.jpg";
 import slide2 from "~/assets/images/slide2.jpg";
+import Header from "~/components/form/Header.vue";
+import Footer from "~/components/form/Footer.vue";
 
 // داده‌های اسلایدشو
 const slides = [
-  { image: slide1, alt: "اسلاید ۱" },
-  { image: slide2, alt: "اسلاید ۲" }
+  {image: slide1, alt: "اسلاید ۱"},
+  {image: slide2, alt: "اسلاید ۲"}
 ];
 </script>
 
