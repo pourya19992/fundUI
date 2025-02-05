@@ -1,79 +1,45 @@
 <template>
   <div>
-    <!-- Navbar -->
-    <nav class="bg-gray-800 text-white px-4 py-2 flex items-center">
-      <!-- دکمه همبرگری -->
-      <button
-          class="text-white md:hidden"
-          @click="toggleMobileSidebar"
-          aria-label="Toggle Sidebar"
-      >
-        ☰
-      </button>
+    <!-- دکمه Hamburger -->
+    <button @click="toggleSidebar" class="fixed top-4 right-4 z-50 p-2 bg-gray-800 text-white rounded-lg">
+      <Icon name="mdi-menu" class="w-6 h-6"/>
+    </button>
 
-      <!-- لینک صفحه اصلی -->
-      <a href="/" class="ml-auto text-blue-400 hover:text-blue-500">
-        <HomeIcon/>
-      </a>
-
-      <!-- آیکون‌ها -->
-      <div class="flex items-center space-x-4 ml-6">
-        <WalletIcon class="cursor-pointer hover:text-blue-400"/>
-        <NotificationIcon class="cursor-pointer hover:text-blue-400"/>
-        <ProfileSettingMenu/>
-      </div>
-    </nav>
-
-    <!-- Sidebar Mobile -->
-    <div
-        v-if="isSidebarOpen"
-        class="fixed top-0 right-0 w-64 h-full bg-gray-800 text-white z-50 transform transition-transform slide-enter-active slide-leave-active"
-    >
-      <div class="flex justify-end p-4">
-        <button @click="toggleMobileSidebar" class="text-white">
-          ✕
+    <!-- Sidebar -->
+    <transition name="slide">
+      <div v-if="isOpen"
+           class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-40 p-5 transition-transform">
+        <!-- دکمه بستن -->
+        <button @click="toggleSidebar" class="absolute top-4 left-4 text-gray-600">
+          <Icon name="mdi-close" class="w-6 h-6"/>
         </button>
+
+        <!-- لینک‌های داشبورد -->
+        <nav class="mt-10">
+          <NuxtLink to="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-gray-200">داشبورد</NuxtLink>
+          <NuxtLink to="/profile" class="block py-3 px-4 rounded-lg hover:bg-gray-200">پروفایل</NuxtLink>
+          <NuxtLink to="/settings" class="block py-3 px-4 rounded-lg hover:bg-gray-200">تنظیمات</NuxtLink>
+        </nav>
       </div>
-      <div class="flex flex-col p-4 space-y-4">
-        <a href="/" class="text-blue-400 hover:text-blue-500">Home</a>
-        <a href="/wallet" class="text-blue-400 hover:text-blue-500">Wallet</a>
-        <a href="/notifications" class="text-blue-400 hover:text-blue-500">Notifications</a>
-        <a href="/profile" class="text-blue-400 hover:text-blue-500">Profile</a>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import {ref} from "vue";
-import HomeIcon from "~/components/icons/HomeIcon.vue";
-import WalletIcon from "~/components/icons/WalletIcon.vue";
-import NotificationIcon from "~/components/icons/NotificationIcon.vue";
+import { ref } from 'vue';
 
-
-const isSidebarOpen = ref(false);
-
-const toggleMobileSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
+const isOpen = ref(false);
+const toggleSidebar = () => {
+  isOpen.value = !isOpen.value;
 };
 </script>
 
 <style scoped>
-/* انتقال سمت چپ به راست برای Sidebar */
-.slide-enter-active,
-.slide-leave-active {
+/* افکت انیمیشن باز شدن Sidebar */
+.slide-enter-active, .slide-leave-active {
   transition: transform 0.3s ease-in-out;
 }
-
-.slide-enter-from {
-  transform: translateX(100%);
-}
-
-.slide-leave-to {
-  transform: translateX(100%);
-}
-
-.sidebar {
+.slide-enter-from, .slide-leave-to {
   transform: translateX(100%);
 }
 </style>

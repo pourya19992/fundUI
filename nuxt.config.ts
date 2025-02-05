@@ -1,17 +1,19 @@
 export default defineNuxtConfig({
     modules: [
-        '@nuxtjs/tailwindcss', // برای طراحی واکنش‌گرا
-        '@pinia/nuxt', // مدیریت وضعیت
-        '@vueuse/nuxt', // ابزارهای مفید Vue
+        '@nuxtjs/tailwindcss',
+        '@pinia/nuxt',
+        '@vueuse/nuxt',
     ],
 
     css: ["~/assets/css/main.css"],
 
     runtimeConfig: {
         public: {
-            apiBase: 'https://api.example.com', // تنظیمات API
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8080",
         },
     },
-
+    plugins: [
+        '~/plugins/api.js', // Make sure this points to the correct path
+    ],
     compatibilityDate: '2025-01-29'
 });

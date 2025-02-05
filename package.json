@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.9.0",
+    "@tanstack/vue-query": "^5.66.0",
     "@vueuse/nuxt": "^12.5.0",
     "axios": "^1.7.9",
     "cookie-universal-nuxt": "^2.2.2",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.13.1",
     "@types/node": "^22.10.10",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vue-tsc": "^2.1.10"
   }
 }

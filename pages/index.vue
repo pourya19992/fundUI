@@ -5,8 +5,8 @@
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
       <!-- Heading -->
-<!--      <h2 class="text-2xl font-iranSans text-center mb-4">صندوق درآمد ثابت</h2>-->
-<!--      <p class="text-gray-700 text-center mb-8">سلام.</p>-->
+      <!--      <h2 class="text-2xl font-iranSans text-center mb-4">صندوق درآمد ثابت</h2>-->
+      <!--      <p class="text-gray-700 text-center mb-8">سلام.</p>-->
 
       <!-- Image Section -->
       <div class="mb-8">
@@ -59,6 +59,12 @@ const slides = [
   {image: slide1, alt: "اسلاید ۱"},
   {image: slide2, alt: "اسلاید ۲"}
 ];
+
+
+definePageMeta({
+  layout: 'default' // اینجا layout شما مشخص می‌شود
+});
+
 </script>
 
 <style scoped>
