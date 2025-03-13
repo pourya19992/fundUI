@@ -1,11 +1,15 @@
 <template>
-  <Header />
+  <Header/>
   <div class="w-full max-w-md mx-auto p-4">
     <h2 class="text-2xl font-bold text-center mb-6">ورود به حساب</h2>
 
-    <!-- فرم ورود -->
+    <div v-if="errorMessage" class="bg-red-100 text-red-700 p-4 rounded mb-4">
+      {{ errorMessage }}
+    </div>
+
+    <!-- login form -->
     <form @submit.prevent="handleLogin" class="space-y-4">
-      <!-- فیلد کاربر -->
+      <!-- useer field -->
       <div>
         <label for="username">نام کاربری</label>
         <input
@@ -18,7 +22,7 @@
         />
       </div>
 
-      <!-- فیلد کلمه عبور -->
+      <!-- password field -->
       <div>
         <label for="password">کلمه عبور</label>
         <input
@@ -31,20 +35,23 @@
         />
       </div>
 
-      <!-- کپچا -->
-      <div>
-        <label for="securityPhrase">کپچا</label>
+      <!-- captcha -->
+      <div class="captcha-container">
+        <p class="captcha-text">{{ captcha }}</p>
+        <button type="button" @click="generateCaptcha" class="refresh-captcha">
+          🔄 تغییر کپچا
+        </button>
         <input
-            id="securityPhrase"
-            v-model="securityPhrase"
+            id="captchaInput"
+            v-model="captchaInput"
             type="text"
             required
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            placeholder="کد امنیتی"
+            class="input-field"
+            placeholder="کد امنیتی را وارد کنید"
         />
       </div>
 
-      <!-- انتخاب نحوه ورود دوعاملی -->
+      <!-- twoFactor method -->
       <div>
         <label for="twoFactor">نحوه ورود</label>
         <select
@@ -52,14 +59,13 @@
             id="twoFactor"
             class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         >
-          <option value="none">None</option>
-          <option value="sms">SMS</option>
-          <option value="email">Email</option>
-          <option value="app">Authenticator App</option>
+          <option v-for="(title, id) in otpStrategies" :key="id" :value="title">
+            {{ title }}
+          </option>
         </select>
       </div>
 
-      <!-- تایمر دوعاملی -->
+      <!-- twoFactor timer -->
       <div v-if="twoFactorMethod !== 'none'">
         <p class="mt-2 text-sm text-gray-700">
           تایید دوعاملی در {{ timer }} ثانیه منقضی می‌شود
@@ -73,7 +79,7 @@
         </button>
       </div>
 
-      <!-- دکمه ورود -->
+      <!-- button login -->
       <div>
         <button
             type="submit"
@@ -84,32 +90,64 @@
       </div>
     </form>
   </div>
-  <Footer />
+  <Footer/>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import {ref} from "vue";
 import Header from "~/components/form/Header.vue";
 import Footer from "~/components/form/Footer.vue";
-import { useApi } from "~/composables/useApi";
+import axios from "axios";
 
-// وضعیت فیلدهای ورودی
+const apiClient = axios.create({
+  baseURL: useRuntimeConfig().public.apiBase,
+  headers: {
+    "X-TenantId": "90001",
+  },
+});
+
+
 const username = ref("");
 const password = ref("");
+const captcha = ref("");
+const captchaInput = ref("");
 const securityPhrase = ref("");
 const twoFactorMethod = ref("none");
+const otpStrategies = ref([]);
+const errorMessage = ref("");
 
-// تایمر
+
 const timer = ref(0);
 let timerInterval;
 
-// استفاده از API
-const { login, sendOtpForLogin } = useApi();
+const apiBase = useRuntimeConfig().public.apiBase;
 
-// شروع تایمر
-const startTimer = () => {
+onMounted(async () => {
+  try {
+    const response = await apiClient.get(`${apiBase}/getOtpStrategies`);
+    otpStrategies.value = response.data;
+    generateCaptcha();
+  } catch (error) {
+    console.error("Failed to fetch OTP strategies:", error);
+  }
+});
+
+const generateCaptcha = () => {
+  captcha.value = Math.random().toString(36).substring(2, 8).toUpperCase();
+};
+
+const verifyCaptcha = () =>{
+  return captchaInput.value.trim().toUpperCase() === captcha.value;
+};
+
+const startTimer = async () => {
   if (twoFactorMethod.value !== "none") {
-    timer.value = 60; // تایمر را از 60 ثانیه شروع می‌کنیم
+    if (!verifyCaptcha()) {
+      errorMessage.value = "کپچا نادرست است.";
+      return;
+    }
+
+    timer.value = 60;
     timerInterval = setInterval(() => {
       if (timer.value > 0) {
         timer.value -= 1;
@@ -118,49 +156,96 @@ const startTimer = () => {
       }
     }, 1000);
 
-    // ارسال درخواست OTP
-    sendOtpForLogin({
-      username: username.value,
-      password: password.value,
-      otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
-    });
+
+    try {
+      await axios.post(`${apiBase}/sendOtpForLogin`, {
+        username: username.value,
+        password: password.value,
+        otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
+      });
+    } catch (error) {
+      console.error("Failed to send OTP:", error);
+      errorMessage.value = parseErrorResponse(error)
+    }
   }
 };
 
-// دریافت شناسه استراتژی OTP
 const getOtpStrategyId = (method) => {
-  switch (method) {
-    case "sms":
-      return 1;
-    case "email":
-      return 2;
-    case "app":
-      return 3;
-    default:
-      return null;
-  }
+  const strategy = otpStrategies.value.find(
+      (strategy) => strategy.title === method
+  );
+  return strategy ? strategy.id : null;
 };
 
-// هندل کردن ورود
+
 const handleLogin = async () => {
   try {
-    await login({
+    const response = await apiClient.post(`${apiBase}/login`, {
       username: username.value,
       password: password.value,
       otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
       otpCode: securityPhrase.value,
+    }, {
+      headers: {
+        "X-TenantId": tenantId,
+      },
     });
+    console.log("Login successful:", response.data);
     // اینجا می‌توانید هدایت به صفحه بعدی یا نمایش پیام موفقیت را انجام دهید
   } catch (error) {
-    console.error("Login failed:", error);
+    console.error("Login failed:", error.response.data);
+    errorMessage.value = parseErrorResponse(error)
   }
 };
 
+const parseErrorResponse = (error) => {
+  if (error.response && error.response.data && error.response.data.message) {
+    return error.response.data.message;
+  }
+  return "خطایی رخ داده است. لطفا دوباره تلاش کنید.";
+};
+
 definePageMeta({
-  layout: "default", // layout شما مشخص می‌شود
+  layout: "default",
 });
 </script>
 
 <style scoped>
-/* استایل‌های صفحه */
+.input-field {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.captcha-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.captcha-text {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  background: #f3f3f3;
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.refresh-captcha {
+  background: #f0ad4e;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.refresh-captcha:hover {
+  background: #ec971f;
+}
 </style>
