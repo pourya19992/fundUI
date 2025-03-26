@@ -1,5 +1,4 @@
 <template>
-  <Header/>
   <div>
 
     <!-- Main Content -->
@@ -41,7 +40,7 @@
     </div>
 
   </div>
-  <Footer/>
+
 </template>
 
 <script setup>
@@ -51,8 +50,6 @@ import "vue3-carousel/dist/carousel.css"; // استایل‌های مورد نی
 // ایمپورت تصاویر
 import slide1 from "~/assets/images/slide1.jpg";
 import slide2 from "~/assets/images/slide2.jpg";
-import Header from "~/components/form/Header.vue";
-import Footer from "~/components/form/Footer.vue";
 
 // داده‌های اسلایدشو
 const slides = [
@@ -62,7 +59,8 @@ const slides = [
 
 
 definePageMeta({
-  layout: 'default' // اینجا layout شما مشخص می‌شود
+  layout: 'default',
+  showSidebar: false
 });
 
 </script>

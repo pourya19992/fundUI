@@ -1,5 +1,4 @@
 <template>
-  <Header/>
   <div class="w-full max-w-md mx-auto p-4">
     <h2 class="text-2xl font-bold text-center mb-6">ورود به حساب</h2>
 
@@ -90,22 +89,14 @@
       </div>
     </form>
   </div>
-  <Footer/>
 </template>
 
 <script setup>
-import {ref} from "vue";
-import Header from "~/components/form/Header.vue";
-import Footer from "~/components/form/Footer.vue";
-import axios from "axios";
+import { ref, onMounted } from "vue";
+import { useRouter } from 'vue-router';
+import { authService } from '~/services/authService';
 
-const apiClient = axios.create({
-  baseURL: useRuntimeConfig().public.apiBase,
-  headers: {
-    "X-TenantId": "90001",
-  },
-});
-
+const router = useRouter();
 
 const username = ref("");
 const password = ref("");
@@ -116,16 +107,13 @@ const twoFactorMethod = ref("none");
 const otpStrategies = ref([]);
 const errorMessage = ref("");
 
-
 const timer = ref(0);
 let timerInterval;
 
-const apiBase = useRuntimeConfig().public.apiBase;
-
 onMounted(async () => {
   try {
-    const response = await apiClient.get(`${apiBase}/getOtpStrategies`);
-    otpStrategies.value = response.data;
+    const strategies = await authService.getOtpStrategies();
+    otpStrategies.value = strategies;
     generateCaptcha();
   } catch (error) {
     console.error("Failed to fetch OTP strategies:", error);
@@ -136,8 +124,15 @@ const generateCaptcha = () => {
   captcha.value = Math.random().toString(36).substring(2, 8).toUpperCase();
 };
 
-const verifyCaptcha = () =>{
+const verifyCaptcha = () => {
   return captchaInput.value.trim().toUpperCase() === captcha.value;
+};
+
+const getOtpStrategyId = (method) => {
+  const strategy = otpStrategies.value.find(
+      (strategy) => strategy.title === method
+  );
+  return strategy ? strategy.id : null;
 };
 
 const startTimer = async () => {
@@ -156,45 +151,40 @@ const startTimer = async () => {
       }
     }, 1000);
 
-
     try {
-      await axios.post(`${apiBase}/sendOtpForLogin`, {
+      await authService.sendOtpForLogin({
         username: username.value,
         password: password.value,
         otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
       });
     } catch (error) {
       console.error("Failed to send OTP:", error);
-      errorMessage.value = parseErrorResponse(error)
+      errorMessage.value = parseErrorResponse(error);
     }
   }
 };
 
-const getOtpStrategyId = (method) => {
-  const strategy = otpStrategies.value.find(
-      (strategy) => strategy.title === method
-  );
-  return strategy ? strategy.id : null;
-};
-
-
 const handleLogin = async () => {
   try {
-    const response = await apiClient.post(`${apiBase}/login`, {
+    if (!verifyCaptcha()) {
+      errorMessage.value = "کپچا نادرست است.";
+      return;
+    }
+
+    const response = await authService.login({
       username: username.value,
       password: password.value,
       otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
       otpCode: securityPhrase.value,
-    }, {
-      headers: {
-        "X-TenantId": tenantId,
-      },
     });
-    console.log("Login successful:", response.data);
-    // اینجا می‌توانید هدایت به صفحه بعدی یا نمایش پیام موفقیت را انجام دهید
+    
+    if (response.token) {
+      authService.setAuthToken(response.token);
+      await router.push('/dashboard');
+    }
   } catch (error) {
-    console.error("Login failed:", error.response.data);
-    errorMessage.value = parseErrorResponse(error)
+    console.error("Login failed:", error);
+    errorMessage.value = parseErrorResponse(error);
   }
 };
 
@@ -202,7 +192,7 @@ const parseErrorResponse = (error) => {
   if (error.response && error.response.data && error.response.data.message) {
     return error.response.data.message;
   }
-  return "خطایی رخ داده است. لطفا دوباره تلاش کنید.";
+  return "خطا در ورود به سیستم";
 };
 
 definePageMeta({
@@ -211,41 +201,42 @@ definePageMeta({
 </script>
 
 <style scoped>
-.input-field {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-top: 5px;
-}
-
 .captcha-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  margin-top: 1rem;
 }
 
 .captcha-text {
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-  background: #f3f3f3;
-  padding: 6px 12px;
-  border-radius: 4px;
-  display: inline-block;
+  font-family: monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  background-color: #f3f4f6;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .refresh-captcha {
-  background: #f0ad4e;
-  color: white;
+  background-color: transparent;
   border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
+  color: #4b5563;
   cursor: pointer;
+  padding: 0.25rem;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
-.refresh-captcha:hover {
-  background: #ec971f;
+.input-field {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px #6366f1;
 }
 </style>

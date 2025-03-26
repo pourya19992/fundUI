@@ -1,87 +1,159 @@
 <template>
-  <div>
-    <div v-if="isLoading">
-      <AppLoading />
+  <div class="container mx-auto p-4" dir="rtl">
+    <Notification
+      :show="notification.show"
+      :message="notification.message"
+      :type="notification.type"
+      @close="closeNotification"
+    />
+    
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-2xl font-bold mb-6">مدیریت دسترسی‌ها</h2>
+
+      <!-- Edit Permission Form -->
+      <EditPermission
+        :permission="selectedPermission"
+        :is-loading="isLoading"
+        class="mb-8"
+        @submit="handleSubmit"
+        @cancel="resetForm"
+      />
+
+      <!-- Permissions Table -->
+      <PermissionTable
+        :permissions="permissions"
+        :is-loading="isLoadingList"
+        :is-disabled="isLoading"
+        @edit="handleEdit"
+        @delete="handleDelete"
+      />
     </div>
-    <transition name="fade">
-      <div v-if="data">
-        <VStack align="stretch" :gap="4">
-          <HStack justify="space-between" pb="8">
-            <Heading>مجوزها</Heading>
-            <AddPermission :refetch="refetch" />
-          </HStack>
-          <PermissionTable :data="data" :refetch="refetch" />
-          <Pagination
-              :currentPage="page"
-              :totalPages="Math.ceil(data.totalElements / size)"
-              :pageSize="size"
-              @pageChange="handlePageChange"
-              @pageSizeChange="handlePageSizeChange"
-           />
-        </VStack>
-      </div>
-    </transition>
   </div>
 </template>
 
-
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useGetAllPermission } from '~/services/authentication';
-import AppLoading from "~/components/form/AppLoading.vue";
-import AddPermission from "~/pages/dashboard/baseInformation/permissions/sections/AddPermission.vue";
-import Pagination from "~/components/form/Pagination.vue";
+import { ref, onMounted } from 'vue';
+import { usePermissionService } from '@/services/permissionService';
+import Notification from '@/components/form/Notification.vue';
+import EditPermission from './sections/EditPermission.vue';
+import PermissionTable from './sections/PermissionTable.vue';
 
-const page = ref(0);
-const size = ref(10);
+interface Permission {
+  id?: number;
+  name: string;
+  url: string;
+  isSensitive: boolean;
+}
 
-// Fetching the permissions using useGetAllPermission from composable
-const { data, refetch, isLoading } = useGetAllPermission(page.value, size.value);
+interface NotificationState {
+  show: boolean;
+  message: string;
+  type: 'success' | 'error';
+}
 
-const handlePageChange = (newPage: number) => {
-  page.value = newPage;
+const permissionService = usePermissionService();
+const permissions = ref<Permission[]>([]);
+const selectedPermission = ref<Permission | undefined>();
+const isLoading = ref(false);
+const isLoadingList = ref(false);
+
+const notification = ref<NotificationState>({
+  show: false,
+  message: '',
+  type: 'success'
+});
+
+const showNotification = (message: string, type: 'success' | 'error') => {
+  notification.value = {
+    show: true,
+    message,
+    type
+  };
+  setTimeout(() => {
+    closeNotification();
+  }, 3000);
 };
 
-const handlePageSizeChange = (newSize: number) => {
-  size.value = newSize;
-  page.value = 0; // Reset page to the first page
+const closeNotification = () => {
+  notification.value.show = false;
 };
+
+const resetForm = () => {
+  selectedPermission.value = undefined;
+};
+
+const loadPermissions = async () => {
+  isLoadingList.value = true;
+  try {
+    const data = await permissionService.getAllPermissions();
+    permissions.value = data;
+  } catch (error) {
+    console.error('Error loading permissions:', error);
+    showNotification('خطا در بارگذاری دسترسی‌ها', 'error');
+  } finally {
+    isLoadingList.value = false;
+  }
+};
+
+const handleSubmit = async (formData: Permission) => {
+  isLoading.value = true;
+  try {
+    if (formData.id) {
+      await permissionService.updatePermission(formData);
+      showNotification('دسترسی با موفقیت ویرایش شد', 'success');
+    } else {
+      await permissionService.addPermission(formData);
+      showNotification('دسترسی با موفقیت اضافه شد', 'success');
+    }
+    resetForm();
+    await loadPermissions();
+  } catch (error) {
+    console.error('Error saving permission:', error);
+    showNotification('خطا در ذخیره‌سازی دسترسی', 'error');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const handleEdit = async (permission: Permission) => {
+  try {
+    const data = await permissionService.getPermissionById(permission.id!);
+    selectedPermission.value = data;
+  } catch (error) {
+    console.error('Error loading permission details:', error);
+    showNotification('خطا در بارگذاری اطلاعات دسترسی', 'error');
+  }
+};
+
+const handleDelete = async (permission: Permission) => {
+  if (!permission.id) return;
+  
+  if (confirm('آیا از حذف این دسترسی اطمینان دارید؟')) {
+    isLoading.value = true;
+    try {
+      await permissionService.deletePermission(permission.id);
+      showNotification('دسترسی با موفقیت حذف شد', 'success');
+      await loadPermissions();
+    } catch (error) {
+      console.error('Error deleting permission:', error);
+      showNotification('خطا در حذف دسترسی', 'error');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+};
+
+onMounted(() => {
+  loadPermissions();
+});
+
+definePageMeta({
+  layout: 'default'
+});
 </script>
 
-
 <style scoped>
-.permissions-page {
-  padding: 20px;
-}
-
-.loading-container {
-  text-align: center;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: 20px;
-}
-
-header h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+.container {
+  max-width: 1200px;
 }
 </style>

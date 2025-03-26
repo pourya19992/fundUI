@@ -1,68 +1,73 @@
 <template>
-  <div class="layout-container">
-    <!-- Sidebar -->
-    <Sidebar class="sidebar" />
+  <div class="layout-container" dir="rtl">
+    <!-- Header -->
+    <Header />
 
     <!-- Main Content -->
-    <div class="content">
-      <Header />
-      <main>
-        <NuxtPage />
-      </main>
-      <Footer />
+    <div class="main-wrapper">
+      <!-- Main Content -->
+      <div :class="['content transition-all duration-300', { 'mr-64': !isSpecialPage && isSidebarOpen }]">
+        <main class="h-full">
+          <slot />
+        </main>
+      </div>
+
+      <!-- Sidebar -->
+      <Sidebar />
     </div>
+
+    <!-- Footer -->
+    <Footer />
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAppStore } from '~/stores/app';
 import Sidebar from '~/components/form/Sidebar.vue';
 import Header from '~/components/form/Header.vue';
 import Footer from '~/components/form/Footer.vue';
+
+const route = useRoute();
+const appStore = useAppStore();
+
+const isSpecialPage = computed(() => {
+  const specialPages = ['/', '/auth/login'];
+  return specialPages.includes(route.path);
+});
+
+const isSidebarOpen = computed(() => appStore.sidebarOpen);
 </script>
 
 <style scoped>
-/* Layout container to hold sidebar and content */
+/* Layout container */
 .layout-container {
-  display: flex;
   min-height: 100vh;
-  background-color: #f9fafb; /* Background color for the page */
+  display: flex;
+  flex-direction: column;
+  background-color: #f9fafb;
 }
 
-/* Sidebar styling */
-.sidebar {
-  width: 250px; /* Adjust based on your sidebar width */
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  background-color: #f9fafb;
-  color: blue;
-  padding: 20px;
-  z-index: 10;
+/* Main wrapper for content */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  position: relative;
 }
 
 /* Main content area */
 .content {
   flex-grow: 1;
-  margin-left: 250px; /* Same as sidebar width */
   padding: 20px;
   background-color: white;
-}
-
-/* Optional: Make header sticky on top */
-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-/* Optional: Make footer stick to the bottom of the page */
-footer {
-  position: sticky;
-  bottom: 0;
+  min-height: calc(100vh - 128px); /* Adjust based on header + footer height */
   width: 100%;
-  background-color: #2d3748;
-  color: white;
-  padding: 10px;
+}
+
+@media (max-width: 768px) {
+  .content.mr-64 {
+    margin-right: 0;
+  }
 }
 </style>

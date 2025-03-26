@@ -1,45 +1,38 @@
 <template>
-  <div>
-    <!-- دکمه Hamburger -->
-    <button @click="toggleSidebar" class="fixed top-4 right-4 z-50 p-2 bg-gray-800 text-white rounded-lg">
-      <Icon name="mdi-menu" class="w-6 h-6"/>
-    </button>
-
+  <div v-if="!isSpecialPage" dir="rtl" class="h-full">
     <!-- Sidebar -->
-    <transition name="slide">
-      <div v-if="isOpen"
-           class="fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-40 p-5 transition-transform">
-        <!-- دکمه بستن -->
-        <button @click="toggleSidebar" class="absolute top-4 left-4 text-gray-600">
-          <Icon name="mdi-close" class="w-6 h-6"/>
-        </button>
-
-        <!-- لینک‌های داشبورد -->
-        <nav class="mt-10">
-          <NuxtLink to="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-gray-200">داشبورد</NuxtLink>
-          <NuxtLink to="/profile" class="block py-3 px-4 rounded-lg hover:bg-gray-200">پروفایل</NuxtLink>
-          <NuxtLink to="/settings" class="block py-3 px-4 rounded-lg hover:bg-gray-200">تنظیمات</NuxtLink>
-        </nav>
-      </div>
-    </transition>
+    <div v-show="isOpen"
+         class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-64 bg-white border-l">
+      <!-- لینک‌های داشبورد -->
+      <nav class="p-5 text-right">
+        <NuxtLink to="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-gray-100">داشبورد</NuxtLink>
+        <NuxtLink to="/dashboard/profile" class="block py-3 px-4 rounded-lg hover:bg-gray-100">پروفایل</NuxtLink>
+        <NuxtLink to="/dashboard/settings" class="block py-3 px-4 rounded-lg hover:bg-gray-100">تنظیمات</NuxtLink>
+      </nav>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useAppStore } from '~/stores/app';
 
-const isOpen = ref(false);
-const toggleSidebar = () => {
-  isOpen.value = !isOpen.value;
-};
+const route = useRoute();
+const appStore = useAppStore();
+
+const isSpecialPage = computed(() => {
+  const specialPages = ['/', '/auth/login'];
+  return specialPages.includes(route.path);
+});
+
+const isOpen = computed(() => appStore.sidebarOpen);
 </script>
 
 <style scoped>
-/* افکت انیمیشن باز شدن Sidebar */
-.slide-enter-active, .slide-leave-active {
-  transition: transform 0.3s ease-in-out;
-}
-.slide-enter-from, .slide-leave-to {
-  transform: translateX(100%);
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+  }
 }
 </style>

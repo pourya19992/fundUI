@@ -4,5 +4,4 @@
   <!-- More content like tables, charts, etc. -->
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
