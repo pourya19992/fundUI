@@ -14,8 +14,8 @@
             type="text"
             :placeholder="`جستجو در ${header}`"
             :value="searchValues[header] || ''"
-            @input="(e) => onSearchChange(header, (e.target as HTMLInputElement).value)"
-            class="text-[#b3b3b3] placeholder-[#b3b3b3] p-1 mt-2 text-xs md:text-sm w-full max-w-full border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            @input="(e) => handleInputChange(header, e)"
+            class="text-[#b3b3b3] placeholder-[#b3b3b3] p-1 mt-2 text-xs md:text-sm w-full max-w-full border rounded focus:outline-none focus:ring-2 focus:ring-indigo-600"
         />
       </div>
     </th>
@@ -31,4 +31,10 @@ interface TableHeaderProps {
 }
 
 const props = defineProps<TableHeaderProps>();
+
+const handleInputChange = (header: string, event: Event) => {
+  const target = event.target as HTMLInputElement;
+
+  props.onSearchChange(header, target.value);
+};
 </script>

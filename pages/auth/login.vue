@@ -1,13 +1,16 @@
 <template>
-  <Header/>
   <div class="w-full max-w-md mx-auto p-4">
     <h2 class="text-2xl font-bold text-center mb-6">ورود به حساب</h2>
 
-    <!-- فرم ورود -->
+    <div v-if="errorMessage" class="bg-red-100 text-red-700 p-4 rounded mb-4">
+      {{ errorMessage }}
+    </div>
+
+    <!-- login form -->
     <form @submit.prevent="handleLogin" class="space-y-4">
-      <!-- فیلد کاربر -->
+      <!-- useer field -->
       <div>
-        <label for="username" >نام کاربری</label>
+        <label for="username">نام کاربری</label>
         <input
             id="username"
             v-model="username"
@@ -18,7 +21,7 @@
         />
       </div>
 
-      <!-- فیلد کلمه عبور -->
+      <!-- password field -->
       <div>
         <label for="password">کلمه عبور</label>
         <input
@@ -31,68 +34,115 @@
         />
       </div>
 
-      <!-- تصویر امنیتی و عبارت امنیتی -->
-      <div>
-        <label for="securityPhrase" >کپچا</label>
+      <!-- captcha -->
+      <div class="captcha-container">
+        <p class="captcha-text">{{ captcha }}</p>
+        <button type="button" @click="generateCaptcha" class="refresh-captcha">
+          🔄 تغییر کپچا
+        </button>
         <input
-            id="securityPhrase"
-            v-model="securityPhrase"
+            id="captchaInput"
+            v-model="captchaInput"
             type="text"
             required
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            class="input-field"
+            placeholder="کد امنیتی را وارد کنید"
         />
-        <p class="mt-2 text-sm text-gray-500">Please enter the phrase above.</p>
       </div>
 
-      <!-- انتخاب نحوه ورود دوعاملی -->
+      <!-- twoFactor method -->
       <div>
-        <label for="twoFactor" >نحوه ورود</label>
-        <select v-model="twoFactorMethod" id="twoFactor"
-                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-          <option value="none">None</option>
-          <option value="sms">SMS</option>
-          <option value="email">Email</option>
-          <option value="app">Authenticator App</option>
+        <label for="twoFactor">نحوه ورود</label>
+        <select
+            v-model="twoFactorMethod"
+            id="twoFactor"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+        >
+          <option v-for="(title, id) in otpStrategies" :key="id" :value="title">
+            {{ title }}
+          </option>
         </select>
       </div>
 
-
-      <!-- تایمر دوعاملی -->
+      <!-- twoFactor timer -->
       <div v-if="twoFactorMethod !== 'none'">
-        <p class="mt-2 text-sm text-gray-700">Two-factor authentication will expire in: {{ timer }} seconds</p>
-        <button type="button" @click="startTimer" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <p class="mt-2 text-sm text-gray-700">
+          تایید دوعاملی در {{ timer }} ثانیه منقضی می‌شود
+        </p>
+        <button
+            type="button"
+            @click="startTimer"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
           ارسال کد
         </button>
       </div>
 
-      <!-- دکمه ورود -->
+      <!-- button login -->
       <div>
-        <button type="submit" class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">ورود</button>
+        <button
+            type="submit"
+            class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          ورود
+        </button>
       </div>
     </form>
   </div>
-  <Footer/>
 </template>
 
 <script setup>
-import {ref} from "vue";
-import Header from "~/components/form/Header.vue";
-import Footer from "~/components/form/Footer.vue";
+import { ref, onMounted } from "vue";
+import { useRouter } from 'vue-router';
+import { authService } from '~/services/authService';
 
-// وضعیت فیلدهای ورودی
+const router = useRouter();
+
 const username = ref("");
 const password = ref("");
+const captcha = ref("");
+const captchaInput = ref("");
 const securityPhrase = ref("");
 const twoFactorMethod = ref("none");
+const otpStrategies = ref([]);
+const errorMessage = ref("");
 
-// تایمر
 const timer = ref(0);
 let timerInterval;
 
-// شروع تایمر
-const startTimer = () => {
+onMounted(async () => {
+  try {
+    const strategies = await authService.getOtpStrategies();
+    otpStrategies.value = strategies;
+    generateCaptcha();
+  } catch (error) {
+    console.error("Failed to fetch OTP strategies:", error);
+  }
+});
+
+const generateCaptcha = () => {
+  captcha.value = Math.random().toString(36).substring(2, 8).toUpperCase();
+};
+
+const verifyCaptcha = () => {
+  return captchaInput.value.trim().toUpperCase() === captcha.value;
+};
+
+const getOtpStrategyId = (method) => {
+  const strategy = otpStrategies.value.find(
+      (strategy) => strategy.title === method
+  );
+  return strategy ? strategy.id : null;
+};
+
+const startTimer = async () => {
   if (twoFactorMethod.value !== "none") {
-    timer.value = 60; // تایمر را از 60 ثانیه شروع می‌کنیم
+    if (!verifyCaptcha()) {
+      errorMessage.value = "کپچا نادرست است.";
+      return;
+    }
+
+    timer.value = 60;
     timerInterval = setInterval(() => {
       if (timer.value > 0) {
         timer.value -= 1;
@@ -100,98 +150,93 @@ const startTimer = () => {
         clearInterval(timerInterval);
       }
     }, 1000);
+
+    try {
+      await authService.sendOtpForLogin({
+        username: username.value,
+        password: password.value,
+        otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
+      });
+    } catch (error) {
+      console.error("Failed to send OTP:", error);
+      errorMessage.value = parseErrorResponse(error);
+    }
   }
 };
 
-// هندل کردن ورود
-const handleLogin = () => {
-  // اینجا می‌توانید درخواست ورود به سرور را ارسال کنید.
-  console.log({
-    username: username.value,
-    password: password.value,
-    securityPhrase: securityPhrase.value,
-    twoFactorMethod: twoFactorMethod.value
-  });
+const handleLogin = async () => {
+  try {
+    if (!verifyCaptcha()) {
+      errorMessage.value = "کپچا نادرست است.";
+      return;
+    }
+
+    const response = await authService.login({
+      username: username.value,
+      password: password.value,
+      otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
+      otpCode: securityPhrase.value,
+    });
+    
+    if (response.token) {
+      authService.setAuthToken(response.token);
+      await router.push('/dashboard');
+    }
+  } catch (error) {
+    console.error("Login failed:", error);
+    errorMessage.value = parseErrorResponse(error);
+  }
 };
+
+const parseErrorResponse = (error) => {
+  if (error.response && error.response.data && error.response.data.message) {
+    return error.response.data.message;
+  }
+  return "خطا در ورود به سیستم";
+};
+
+definePageMeta({
+  layout: "default",
+});
 </script>
 
 <style scoped>
-.login-container {
-  display: flex;
-  height: 100vh;
-}
-.login-left {
-  flex: 2;
-  background-position: center;
-  background-size: cover;
-}
-.login-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.login-logo {
-  width: 128px;
-  object-fit: contain;
-}
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.tab-button {
-  padding: 10px 20px;
-  background-color: #e0e0e0;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.tab-selected {
-  background-color: #eb7322;
-  color: #414141;
-}
-.form-control {
-  margin-bottom: 20px;
-}
-input {
-  padding: 10px;
-  width: 100%;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  text-align: right;
-}
 .captcha-container {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  margin-top: 1rem;
 }
-.captcha-container img {
-  max-width: 200px;
-  height: auto;
+
+.captcha-text {
+  font-family: monospace;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  background-color: #f3f4f6;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
 }
-.error-message {
-  color: red;
-  margin-bottom: 20px;
-}
-.buttons {
-  display: flex;
-  gap: 10px;
-}
-button {
-  padding: 10px 20px;
-  background-color: #021b34;
-  color: white;
+
+.refresh-captcha {
+  background-color: transparent;
   border: none;
-  cursor: pointer;
-}
-label {
-  display: block;
-  text-align: right;
-  font-size: 0.875rem;
-  font-weight: 500;
   color: #4b5563;
-  margin-bottom: 0.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  margin-top: 0.25rem;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px #6366f1;
 }
 </style>
