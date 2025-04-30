@@ -8,6 +8,7 @@
         <NuxtLink to="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-gray-100">داشبورد</NuxtLink>
         <NuxtLink to="/dashboard/profile" class="block py-3 px-4 rounded-lg hover:bg-gray-100">پروفایل</NuxtLink>
         <NuxtLink to="/dashboard/settings" class="block py-3 px-4 rounded-lg hover:bg-gray-100">تنظیمات</NuxtLink>
+        <NuxtLink to="/dashboard/administration/branch" class="block py-3 px-4 rounded-lg hover:bg-gray-100">شعب</NuxtLink>
       </nav>
     </div>
   </div>
