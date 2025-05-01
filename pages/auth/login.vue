@@ -36,10 +36,17 @@
 
       <!-- captcha -->
       <div class="captcha-container">
-        <p class="captcha-text">{{ captcha }}</p>
-        <button type="button" @click="generateCaptcha" class="refresh-captcha">
-          🔄 تغییر کپچا
-        </button>
+        <div class="captcha-wrapper">
+          <p class="captcha-text">{{ captcha }}</p>
+          <button 
+            type="button" 
+            @click="generateCaptcha" 
+            class="refresh-captcha"
+          >
+            <span class="refresh-icon">🔄</span>
+            <span>تغییر کپچا</span>
+          </button>
+        </div>
         <input
             id="captchaInput"
             v-model="captchaInput"
@@ -47,6 +54,7 @@
             required
             class="input-field"
             placeholder="کد امنیتی را وارد کنید"
+            dir="ltr"
         />
       </div>
 
@@ -83,8 +91,9 @@
         <button
             type="submit"
             class="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            :disabled="isLoading"
         >
-          ورود
+          {{ isLoading ? 'در حال ورود...' : 'ورود' }}
         </button>
       </div>
     </form>
@@ -94,8 +103,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
-import { authService } from '~/services/authService';
+import { useNuxtApp } from '#app';
 
+const { $auth } = useNuxtApp();
 const router = useRouter();
 
 const username = ref("");
@@ -106,13 +116,14 @@ const securityPhrase = ref("");
 const twoFactorMethod = ref("none");
 const otpStrategies = ref([]);
 const errorMessage = ref("");
+const isLoading = ref(false);
 
 const timer = ref(0);
 let timerInterval;
 
 onMounted(async () => {
   try {
-    const strategies = await authService.getOtpStrategies();
+    const strategies = await $auth.getOtpStrategies();
     otpStrategies.value = strategies;
     generateCaptcha();
   } catch (error) {
@@ -121,7 +132,15 @@ onMounted(async () => {
 });
 
 const generateCaptcha = () => {
-  captcha.value = Math.random().toString(36).substring(2, 8).toUpperCase();
+  // پاک کردن ورودی قبلی
+  captchaInput.value = "";
+  // تولید کپچای جدید
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  captcha.value = result;
 };
 
 const verifyCaptcha = () => {
@@ -129,6 +148,10 @@ const verifyCaptcha = () => {
 };
 
 const getOtpStrategyId = (method) => {
+  if (!Array.isArray(otpStrategies.value)) {
+    console.error('OTP strategies is not an array:', otpStrategies.value);
+    return null;
+  }
   const strategy = otpStrategies.value.find(
       (strategy) => strategy.title === method
   );
@@ -152,10 +175,16 @@ const startTimer = async () => {
     }, 1000);
 
     try {
-      await authService.sendOtpForLogin({
+      const strategyId = getOtpStrategyId(twoFactorMethod.value);
+      if (!strategyId) {
+        errorMessage.value = "خطا در دریافت استراتژی OTP";
+        return;
+      }
+
+      await $auth.sendOtpForLogin({
         username: username.value,
         password: password.value,
-        otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
+        otpStrategyTypeId: strategyId,
       });
     } catch (error) {
       console.error("Failed to send OTP:", error);
@@ -166,31 +195,51 @@ const startTimer = async () => {
 
 const handleLogin = async () => {
   try {
+    isLoading.value = true;
+    errorMessage.value = "";
+
     if (!verifyCaptcha()) {
       errorMessage.value = "کپچا نادرست است.";
       return;
     }
 
-    const response = await authService.login({
+    const strategyId = getOtpStrategyId(twoFactorMethod.value);
+    if (twoFactorMethod.value !== "none" && !strategyId) {
+      errorMessage.value = "خطا در دریافت استراتژی OTP";
+      return;
+    }
+
+    const loginData = {
       username: username.value,
       password: password.value,
-      otpStrategyTypeId: getOtpStrategyId(twoFactorMethod.value),
-      otpCode: securityPhrase.value,
-    });
+      otpStrategyTypeId: strategyId,
+      otpCode: securityPhrase.value
+    };
+
+    const response = await $auth.login(loginData);
     
-    if (response.token) {
-      authService.setAuthToken(response.token);
+    if (response) {
+      $auth.setAuthToken(response);
       await router.push('/dashboard');
+    } else {
+      errorMessage.value = "خطا در دریافت توکن";
     }
   } catch (error) {
-    console.error("Login failed:", error);
     errorMessage.value = parseErrorResponse(error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
 const parseErrorResponse = (error) => {
-  if (error.response && error.response.data && error.response.data.message) {
-    return error.response.data.message;
+  if (error.response && error.response.data) {
+    const errorData = error.response.data;
+    if (errorData.message) {
+      return errorData.message;
+    }
+    if (errorData.error) {
+      return errorData.error;
+    }
   }
   return "خطا در ورود به سیستم";
 };
@@ -203,40 +252,67 @@ definePageMeta({
 <style scoped>
 .captcha-container {
   margin-top: 1rem;
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.captcha-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
 }
 
 .captcha-text {
-  font-family: monospace;
+  font-family: 'Courier New', monospace;
   font-size: 1.5rem;
+  font-weight: bold;
   letter-spacing: 0.5rem;
   background-color: #f3f4f6;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border-radius: 0.375rem;
   text-align: center;
-  margin-bottom: 0.5rem;
+  min-width: 150px;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
 }
 
 .refresh-captcha {
-  background-color: transparent;
-  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
   color: #4b5563;
   cursor: pointer;
-  padding: 0.25rem;
-  margin-bottom: 0.5rem;
-  display: block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+}
+
+.refresh-captcha:hover {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.refresh-icon {
+  font-size: 1.25rem;
 }
 
 .input-field {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
-  margin-top: 0.25rem;
+  font-size: 1rem;
+  background-color: white;
 }
 
 .input-field:focus {
   outline: none;
   border-color: #6366f1;
-  box-shadow: 0 0 0 1px #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 </style>

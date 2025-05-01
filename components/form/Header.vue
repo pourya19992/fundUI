@@ -12,6 +12,15 @@
           <Icon name="mdi:menu" class="w-6 h-6 text-gray-600"/>
         </button>
 
+        <button 
+          v-if="!isSpecialPage && showBackButton"
+          @click="goBack" 
+          class="p-2 hover:bg-gray-100 rounded-lg flex items-center justify-center"
+          aria-label="Go Back"
+        >
+          <Icon name="mdi:arrow-right" class="w-6 h-6 text-gray-600"/>
+        </button>
+
         <nav>
           <ul class="flex gap-8">
             <li><NuxtLink to="/" class="text-gray-600 hover:text-blue-600 px-2">صفحه اصلی</NuxtLink></li>
@@ -29,10 +38,11 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useAppStore } from '~/stores/app';
 
 const route = useRoute();
+const router = useRouter();
 const appStore = useAppStore();
 
 const isSpecialPage = computed(() => {
@@ -41,8 +51,17 @@ const isSpecialPage = computed(() => {
   return specialPages.includes(route.path);
 });
 
+const showBackButton = computed(() => {
+  // نمایش دکمه بک در همه صفحات به جز صفحات خاص و داشبورد اصلی
+  return !isSpecialPage.value && route.path !== '/dashboard';
+});
+
 const toggleSidebar = () => {
   appStore.toggleSidebar();
+};
+
+const goBack = () => {
+  router.back();
 };
 </script>
 
