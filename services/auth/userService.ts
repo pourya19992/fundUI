@@ -179,6 +179,14 @@ export const createUserService = (baseURL: string) => {
       } catch (error) {
         throw error;
       }
+    },
+
+    async logout(): Promise<void> {
+      try {
+        await apiClient.post('/logout');
+      } catch (error) {
+        throw error;
+      }
     }
   };
 }; 
