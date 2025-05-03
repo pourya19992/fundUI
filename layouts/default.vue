@@ -18,6 +18,7 @@
 
     <!-- Footer -->
     <Footer />
+
   </div>
 </template>
 

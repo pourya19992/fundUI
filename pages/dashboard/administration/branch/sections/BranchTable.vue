@@ -28,20 +28,18 @@
             </span>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-left">
-            <button
-              @click="$emit('edit', branch)"
-              :disabled="isDisabled"
-              class="text-blue-600 hover:text-blue-900 ml-2 disabled:opacity-50"
-            >
-              ویرایش
-            </button>
-            <button
-              @click="$emit('delete', branch)"
-              :disabled="isDisabled"
-              class="text-red-600 hover:text-red-900 disabled:opacity-50"
-            >
-              حذف
-            </button>
+            <div class="flex items-center gap-2">
+              <EditIcon
+                @click="updateBranch(branch)"
+                :disabled="isDisabled"
+                class="disabled:opacity-50 cursor-pointer"
+              />
+              <TrashIcon
+                @click="deleteBranch(branch)"
+                :disabled="isDisabled"
+                class="disabled:opacity-50 cursor-pointer"
+              />
+            </div>
           </td>
         </tr>
         <tr v-if="branches.length === 0">
@@ -55,6 +53,24 @@
 </template>
 
 <script setup lang="ts">
+import EditIcon from '@/components/icons/EditIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
+import { createFundService } from '@/services/administration/fundService';
+import { useRuntimeConfig } from 'nuxt/app';
+
+const config = useRuntimeConfig();
+const fundService = createFundService(config.public.apiBase);
+
+const updateBranch = (branch: Branch) => {
+  fundService.updateBranch(branch);
+};
+
+const deleteBranch = (branch: Branch) => {
+  if (confirm('آیا از حذف این شعبه اطمینان دارید؟')) {
+    fundService.deleteBranch(branch.id);
+  }
+};
+
 interface Branch {
   id: number;
   isActive: boolean;
