@@ -26,6 +26,11 @@ export interface FundBranchDto {
   address?: string;
 }
 
+interface ApiResponse {
+  message: string;
+  data?: any;
+}
+
 interface ApiErrorResponse {
   code: string;
   message: string;
@@ -55,19 +60,30 @@ export const createBranchService = (baseURL: string) => {
       }
     },
 
-    async addBranch(branch: FundBranchDto): Promise<void> {
+    async addBranch(branch: FundBranchDto): Promise<ApiResponse> {
       try {
-        await apiClient.post('/api/v1/administration/branch/add', branch);
+        const response = await apiClient.post('/api/v1/administration/branch/add', branch);
+        return {
+          message: response.data.message || 'شعبه با موفقیت اضافه شد'
+        };
       } catch (error) {
-        handleError(error);
+        return handleError(error);
       }
     },
 
-    async updateBranch(branch: FundBranchDto): Promise<void> {
+    async updateBranch(branch: FundBranchDto): Promise<ApiResponse> {
       try {
-        await apiClient.put('/api/v1/administration/branch/edit', branch);
+        const payload = {
+          ...branch,
+          id: typeof branch.id === 'string' ? parseInt(branch.id) : branch.id
+        };
+        
+        const response = await apiClient.put('/api/v1/administration/branch/edit', payload);
+        return {
+          message: response.data.message || 'شعبه با موفقیت ویرایش شد'
+        };
       } catch (error) {
-        handleError(error);
+        return handleError(error);
       }
     },
 

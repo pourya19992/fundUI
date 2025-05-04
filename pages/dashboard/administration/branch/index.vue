@@ -10,12 +10,10 @@
     <div class="bg-white rounded-lg shadow p-6">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">مدیریت شعب</h2>
-      </div>
-
-      <!-- Add Branch Button -->
-      <div class="mb-6">
-        <AddBranch
-          :refetch="loadBranches" />
+        <BranchForm
+          ref="branchFormRef"
+          :refetch="loadBranches"
+        />
       </div>
 
       <!-- Branches Table -->
@@ -34,13 +32,12 @@
 import { ref, onMounted } from 'vue';
 import { createBranchService } from '../../../../services/administration/branchService';
 import Notification from '../../../../components/form/Notification.vue';
-import AddBranch from '../../../../pages/dashboard/administration/branch/sections/AddBranch.vue';
-import BranchTable from '../../../../pages/dashboard/administration/branch/sections/BranchTable.vue';
+import BranchForm from './sections/BranchForm.vue';
+import BranchTable from './sections/BranchTable.vue';
 import { useRuntimeConfig } from 'nuxt/app';
 import { useRouter } from 'vue-router';
 import { useAppStore } from '../../../../stores/app';
 import { BASE_URL } from '@/utils/constants';
-
 
 interface Branch {
   id: number;
@@ -68,6 +65,7 @@ const branchService = createBranchService(BASE_URL);
 const branches = ref<Branch[]>([]);
 const isLoading = ref(false);
 const isLoadingList = ref(false);
+const branchFormRef = ref(null);
 
 const notification = ref<NotificationState>({
   show: false,
@@ -112,8 +110,8 @@ const loadBranches = async () => {
 const handleEdit = async (branch: Branch) => {
   try {
     const data = await branchService.getBranch(branch.id);
-    if (data) {
-      // Handle edit logic
+    if (data && branchFormRef.value) {
+      (branchFormRef.value as any).openForEdit(data);
     }
   } catch (error: any) {
     console.error('Error loading branch details:', error);
