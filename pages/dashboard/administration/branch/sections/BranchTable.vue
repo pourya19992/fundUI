@@ -51,24 +51,21 @@
     </table>
   </div>
 </template>
-
 <script setup lang="ts">
-import EditIcon from '@/components/icons/EditIcon.vue';
-import TrashIcon from '@/components/icons/TrashIcon.vue';
-import { createFundService } from '@/services/administration/fundService';
+import EditIcon from '../../../../../components/icons/EditIcon.vue';
+import TrashIcon from '../../../../../components/icons/TrashIcon.vue';
+import { createBranchService } from '@/services/administration/branchService';
 import { useRuntimeConfig } from 'nuxt/app';
 
 const config = useRuntimeConfig();
-const fundService = createFundService(config.public.apiBase);
+
 
 const updateBranch = (branch: Branch) => {
-  fundService.updateBranch(branch);
+  emit('edit', branch);
 };
 
 const deleteBranch = (branch: Branch) => {
-  if (confirm('آیا از حذف این شعبه اطمینان دارید؟')) {
-    fundService.deleteBranch(branch.id);
-  }
+  emit('delete', branch);
 };
 
 interface Branch {
@@ -90,7 +87,7 @@ defineProps<{
   isDisabled: boolean;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'edit', branch: Branch): void;
   (e: 'delete', branch: Branch): void;
 }>();

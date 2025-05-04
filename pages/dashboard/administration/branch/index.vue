@@ -14,7 +14,8 @@
 
       <!-- Add Branch Button -->
       <div class="mb-6">
-        <AddBranch @refetch="loadBranches" />
+        <AddBranch
+          :refetch="loadBranches" />
       </div>
 
       <!-- Branches Table -->
@@ -31,13 +32,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { createFundService } from '@/services/administration/fundService';
-import Notification from '@/components/form/Notification.vue';
-import AddBranch from '@/pages/dashboard/administration/branch/sections/AddBranch.vue';
-import BranchTable from '@/pages/dashboard/administration/branch/sections/BranchTable.vue';
+import { createBranchService } from '../../../../services/administration/branchService';
+import Notification from '../../../../components/form/Notification.vue';
+import AddBranch from '../../../../pages/dashboard/administration/branch/sections/AddBranch.vue';
+import BranchTable from '../../../../pages/dashboard/administration/branch/sections/BranchTable.vue';
 import { useRuntimeConfig } from 'nuxt/app';
 import { useRouter } from 'vue-router';
-import { useAppStore } from '@/stores/app';
+import { useAppStore } from '../../../../stores/app';
+import { BASE_URL } from '@/utils/constants';
+
 
 interface Branch {
   id: number;
@@ -61,7 +64,7 @@ interface NotificationState {
 const router = useRouter();
 const appStore = useAppStore();
 const config = useRuntimeConfig();
-const fundService = createFundService(config.public.apiBase);
+const branchService = createBranchService(BASE_URL);
 const branches = ref<Branch[]>([]);
 const isLoading = ref(false);
 const isLoadingList = ref(false);
@@ -90,11 +93,13 @@ const closeNotification = () => {
 const loadBranches = async () => {
   isLoadingList.value = true;
   try {
-    const data = await fundService.getBranchList();
+    const data = await branchService.getBranches();
     branches.value = data;
   } catch (error: any) {
     console.error('Error loading branches:', error);
-    if (error.message) {
+    if (error.code && error.message) {
+      showNotification(`${error.message} (کد: ${error.code})`, 'error');
+    } else if (error.message) {
       showNotification(error.message, 'error');
     } else {
       showNotification('خطا در بارگذاری شعب', 'error');
@@ -106,13 +111,15 @@ const loadBranches = async () => {
 
 const handleEdit = async (branch: Branch) => {
   try {
-    const data = await fundService.getBranchList(branch.id);
-    if (data && data.length > 0) {
+    const data = await branchService.getBranch(branch.id);
+    if (data) {
       // Handle edit logic
     }
   } catch (error: any) {
     console.error('Error loading branch details:', error);
-    if (error.message) {
+    if (error.code && error.message) {
+      showNotification(`${error.message} (کد: ${error.code})`, 'error');
+    } else if (error.message) {
       showNotification(error.message, 'error');
     } else {
       showNotification('خطا در بارگذاری اطلاعات شعبه', 'error');
@@ -126,12 +133,14 @@ const handleDelete = async (branch: Branch) => {
   if (confirm('آیا از حذف این شعبه اطمینان دارید؟')) {
     isLoading.value = true;
     try {
-      await fundService.deleteBranch(branch.id);
+      await branchService.deleteBranch(branch.id);
       showNotification('شعبه با موفقیت حذف شد', 'success');
       await loadBranches();
     } catch (error: any) {
       console.error('Error deleting branch:', error);
-      if (error.message) {
+      if (error.code && error.message) {
+        showNotification(`${error.message} (کد: ${error.code})`, 'error');
+      } else if (error.message) {
         showNotification(error.message, 'error');
       } else {
         showNotification('خطا در حذف شعبه', 'error');

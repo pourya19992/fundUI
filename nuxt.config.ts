@@ -1,3 +1,5 @@
+import { defineNuxtConfig } from 'nuxt/config'
+
 export default defineNuxtConfig({
     modules: [
         '@nuxtjs/tailwindcss',
@@ -13,5 +15,17 @@ export default defineNuxtConfig({
             apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://localhost:8080",
         },
     },
+
+    postcss: {
+        plugins: {
+            tailwindcss: {},
+            autoprefixer: {},
+        }
+    },
+
+    build: {
+        transpile: ['vue']
+    },
+    
     compatibilityDate: '2025-01-29'
 });

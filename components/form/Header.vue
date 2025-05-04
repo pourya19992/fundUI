@@ -102,20 +102,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useAppStore } from '@/stores/app';
-import HomeIcon from '@/components/icons/HomeIcon.vue';
-import BurgerMenuIcon from '@/components/icons/BurgerMenuIcon.vue';
-import ExitIcon from '@/components/icons/ExitIcon.vue';
-import BackIcon from '../icons/BackIcon.vue';
-import Supporter from '../icons/SupporterIcon.vue';
-import { createUserService } from '@/services/auth/userService';
+import { useAppStore } from '../../stores/app';
+import HomeIcon from '../../components/icons/HomeIcon.vue';
+import BurgerMenuIcon from '../../components/icons/BurgerMenuIcon.vue';
+import ExitIcon from '../../components/icons/ExitIcon.vue';
+import BackIcon from '../../components/icons/BackIcon.vue';
+import Supporter from '../../components/icons/SupporterIcon.vue';
+import { createAuthService } from '../../services/auth/authService';
+
 
 const route = useRoute();
 const router = useRouter();
 const appStore = useAppStore();
-const userStore = useUserStore();
-const config = useRuntimeConfig();
-const userService = createUserService(config.public.apiBase);
+const authService = createAuthService();
 
 const isSpecialPage = computed(() => {
   const specialPages = ['/', '/auth/login'];
@@ -139,14 +138,10 @@ const goToHome = () => {
 };
 
 const handleLogout = async () => {
-  if (confirm('آیا از خروج از سیستم اطمینان دارید؟')) {
-    try {
-      await userService.logout();
-    } catch (e) {
-      // optionally handle error
-    }
-    userStore.logout();
-    router.push('/auth/login');
+  try {
+    await authService.logout();
+  } catch (error) {
+    console.error('Logout failed:', error);
   }
 };
 

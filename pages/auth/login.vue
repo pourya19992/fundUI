@@ -104,9 +104,13 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
 import { useNuxtApp } from '#app';
+import { createAuthService } from '../../services/auth/authService';
+import { navigateTo } from '#imports';
+import { BASE_URL } from '@/utils/constants';
 
 const { $auth } = useNuxtApp();
 const router = useRouter();
+const authService = createAuthService(BASE_URL);
 
 const username = ref("");
 const password = ref("");
@@ -123,7 +127,7 @@ let timerInterval;
 
 onMounted(async () => {
   try {
-    const strategies = await $auth.getOtpStrategies();
+    const strategies = await authService.getOtpStrategies();
     otpStrategies.value = strategies;
     generateCaptcha();
   } catch (error) {
@@ -148,12 +152,13 @@ const verifyCaptcha = () => {
 };
 
 const getOtpStrategyId = (method) => {
-  if (!Array.isArray(otpStrategies.value)) {
-    console.error('OTP strategies is not an array:', otpStrategies.value);
-    return null;
-  }
-  const strategy = otpStrategies.value.find(
-      (strategy) => strategy.title === method
+  // Convert object to array if needed
+  const strategies = Array.isArray(otpStrategies.value) 
+    ? otpStrategies.value 
+    : Object.entries(otpStrategies.value).map(([id, title]) => ({ id: parseInt(id), title }));
+
+  const strategy = strategies.find(
+    (strategy) => strategy.title === method
   );
   return strategy ? strategy.id : null;
 };
@@ -216,13 +221,19 @@ const handleLogin = async () => {
       otpCode: securityPhrase.value
     };
 
-    const response = await $auth.login(loginData);
+    const response = await authService.login(loginData);
     
     if (response) {
-      $auth.setAuthToken(response);
-      await router.push('/dashboard');
-    } else {
-      errorMessage.value = "خطا در دریافت توکن";
+      // Redirect to main dashboard page
+      try {
+        await router.push('/dashboard');
+      } catch {
+        try {
+          await navigateTo('/dashboard');
+        } catch {
+          window.location.replace('/dashboard');
+        }
+      }
     }
   } catch (error) {
     errorMessage.value = parseErrorResponse(error);
@@ -242,6 +253,14 @@ const parseErrorResponse = (error) => {
     }
   }
   return "خطا در ورود به سیستم";
+};
+
+const handleLogout = async () => {
+  try {
+    await authService.logout();
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
 };
 
 definePageMeta({

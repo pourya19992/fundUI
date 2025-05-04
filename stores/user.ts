@@ -33,12 +33,18 @@ export const useUserStore = defineStore('user', {
 
     setToken(token: string | null) {
       this.token = token
+      if (token) {
+        localStorage.setItem('token', token)
+      } else {
+        localStorage.removeItem('token')
+      }
     },
 
     logout() {
       this.user = null
       this.isAuthenticated = false
-      this.token = null
+      this.setToken(null)
+      localStorage.removeItem('token')
     }
   }
 }) 

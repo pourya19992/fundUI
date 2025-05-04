@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { log } from 'console';
 
 export interface User {
   id: number;
@@ -95,6 +96,7 @@ export const createUserService = (baseURL: string) => {
 
   apiClient.interceptors.request.use((config) => {
     const token = localStorage.getItem('token');
+    console.log(token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -184,6 +186,7 @@ export const createUserService = (baseURL: string) => {
     async logout(): Promise<void> {
       try {
         await apiClient.post('/logout');
+        localStorage.removeItem('token');
       } catch (error) {
         throw error;
       }
