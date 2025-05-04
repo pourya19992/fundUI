@@ -1,7 +1,6 @@
 import axios from "axios";
-import { useCookie } from "#app";
-import { useRuntimeConfig, navigateTo } from "#imports";
-import { ACCESS_TOKEN_NAME } from "~/utils/constants";
+
+import { ACCESS_TOKEN_NAME, BASE_URL } from "../utils/constants";
 
 export interface ErrorData {
   errorMessage: string;
@@ -12,44 +11,78 @@ export interface ErrorData {
 
 // -------------------------Create an authenticated API instance----------------
 export const createAuthenticatedAxiosInstance = () => {
-  const config = useRuntimeConfig();
-  const baseURL = config.public.apiBase;
-  const token = useCookie(ACCESS_TOKEN_NAME);
+  const token = localStorage.getItem(ACCESS_TOKEN_NAME);
 
-  const instance = axios.create({ baseURL });
+  const instance = axios.create({ 
+    baseURL: BASE_URL,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  });
 
   instance.interceptors.request.use((config) => {
-    if (token.value) {
+    const token = localStorage.getItem(ACCESS_TOKEN_NAME);
+    if (token) {
       config.headers = config.headers || {};
-      config.headers["Authorization"] = `Bearer ${token.value}`;
+      config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;
+  }, (error) => {
+    return Promise.reject(error);
   });
 
   instance.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if ([401, 403].includes(error.response?.status)) {
-          token.value = null;
-          navigateTo("/");
+    (response) => response,
+    (error) => {
+      if (error.response) {
+        // Server responded with error
+        console.error('Server Error:', error.response.data);
+        if ([401, 403].includes(error.response.status)) {
+          localStorage.removeItem(ACCESS_TOKEN_NAME);
+          window.location.href = '/auth/login';
         }
-        return Promise.reject(error);
+        return Promise.reject(error.response.data);
+      } else if (error.request) {
+        // Request was made but no response
+        console.error('Network Error:', error.request);
+        return Promise.reject({ message: 'خطا در برقراری ارتباط با سرور' });
+      } else {
+        // Something else happened
+        console.error('Error:', error.message);
+        return Promise.reject({ message: 'خطای غیرمنتظره رخ داد' });
       }
+    }
   );
 
   return instance;
 };
+
 //------------------ Create an unauthenticated API instance---------------------
 export const createUnauthenticatedAxiosInstance = () => {
-  const config = useRuntimeConfig();
-  const baseURL: string = config.public.API_BASE_URL as string;
-
   const instance = axios.create({
-    baseURL,
+    baseURL: BASE_URL,
     headers: {
-      clientId: config.public.CLIENT_ID as string
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
     }
   });
+
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response) {
+        console.error('Server Error:', error.response.data);
+        return Promise.reject(error.response.data);
+      } else if (error.request) {
+        console.error('Network Error:', error.request);
+        return Promise.reject({ message: 'خطا در برقراری ارتباط با سرور' });
+      } else {
+        console.error('Error:', error.message);
+        return Promise.reject({ message: 'خطای غیرمنتظره رخ داد' });
+      }
+    }
+  );
 
   return instance;
 };

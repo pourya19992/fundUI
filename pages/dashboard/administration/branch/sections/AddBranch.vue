@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { createFundService } from "~/services/administration/fundService";
+import { createBranchService } from "~/services/administration/branchService";
 import Modal from "~/components/Modal.vue";
 import { useNotify } from "~/helpers/hooks/useNotify";
 import { useRuntimeConfig } from '#app';
@@ -69,7 +69,7 @@ const props = defineProps({
 });
 
 const config = useRuntimeConfig();
-const fundService = createFundService(config.public.apiBase);
+const branchService = createBranchService(config.public.apiBase);
 
 const isOpen = ref(false);
 const isLoading = ref(false);
@@ -112,7 +112,7 @@ const handleSubmit = async () => {
 
   isLoading.value = true;
   try {
-    await fundService.addBranch({
+    await branchService.addBranch({
       code: code.value,
       name: name.value,
       isActive: true,

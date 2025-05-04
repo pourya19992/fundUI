@@ -162,44 +162,6 @@ export const createFundService = (baseURL: string) => {
       } catch (error) {
         throw error;
       }
-    },
-
-    // Branch operations
-    async getBranchList(branchId?: number): Promise<FundBranch[]> {
-      try {
-        const url = branchId 
-          ? `/api/v1/administration/branch/${branchId}`
-          : '/api/v1/administration/branch';
-        const response = await apiClient.get(url);
-        return response.data;
-      } catch (error) {
-        handleError(error);
-        throw error;
-      }
-    },
-
-    async addBranch(branch: FundBranchDto): Promise<void> {
-      try {
-        await apiClient.post('/api/v1/administration/branch/add', branch);
-      } catch (error) {
-        handleError(error);
-      }
-    },
-
-    async updateBranch(branch: FundBranchDto): Promise<void> {
-      try {
-        await apiClient.put('/api/v1/administration/branch/edit', branch);
-      } catch (error) {
-        handleError(error);
-      }
-    },
-
-    async deleteBranch(branchId: number): Promise<void> {
-      try {
-        await apiClient.delete(`/api/v1/administration/branch/remove/${branchId}`);
-      } catch (error) {
-        handleError(error);
-      }
     }
   };
 }; 

@@ -26,23 +26,26 @@ input {
 
 @font-face {
     font-family: "IRANSansXFaNum";
-    src: url("/public/fonts/IRANSansXFaNum-Regular.ttf") format("truetype");
+    src: url("/fonts/IRANSansXFaNum-Regular.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
     font-family: "IRANSansXFaNum";
-    src: url("/public/fonts/IRANSansXFaNum-Bold.ttf") format("truetype");
+    src: url("/fonts/IRANSansXFaNum-Bold.ttf") format("truetype");
     font-weight: bold;
     font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
     font-family: "IRANSansXFaNum";
-    src: url("/public/fonts/IRANSansXFaNum-Black.ttf") format("truetype");
+    src: url("/fonts/IRANSansXFaNum-Black.ttf") format("truetype");
     font-weight: 900;
     font-style: normal;
+    font-display: swap;
 }
 
 body {
