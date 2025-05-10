@@ -1,6 +1,6 @@
 import { createBaseService } from '../baseService';
 
-export interface FundBranch {
+export interface Branch {
   id: number;
   isActive: boolean;
   code: string;
@@ -13,7 +13,7 @@ export interface FundBranch {
   address: string;
 }
 
-export interface FundBranchDto {
+export interface BranchDto {
   id?: number;
   isActive: boolean;
   code: string;

@@ -93,7 +93,7 @@ export const createFundService = (baseURL: string) => {
     // Fund operations
     async getFundList(fundId?: number): Promise<Fund[]> {
       try {
-        const url = fundId 
+        const url = fundId
           ? `/api/v1/administration/fund/${fundId}`
           : '/api/v1/administration/fund';
         const response = await apiClient.get(url);
@@ -130,7 +130,7 @@ export const createFundService = (baseURL: string) => {
     // Calendar operations
     async getCalendarList(calendarId?: number): Promise<Calendar[]> {
       try {
-        const url = calendarId 
+        const url = calendarId
           ? `/api/v1/administration/calendar/${calendarId}`
           : '/api/v1/administration/calendar';
         const response = await apiClient.get(url);
@@ -139,29 +139,5 @@ export const createFundService = (baseURL: string) => {
         throw error;
       }
     },
-
-    async addCalendar(calendar: CalendarDto): Promise<void> {
-      try {
-        await apiClient.post('/api/v1/administration/calendar/add', calendar);
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async updateCalendar(calendar: CalendarDto): Promise<void> {
-      try {
-        await apiClient.put('/api/v1/administration/calendar/edit', calendar);
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async deleteCalendar(calendarId: number): Promise<void> {
-      try {
-        await apiClient.delete(`/api/v1/administration/calendar/remove/${calendarId}`);
-      } catch (error) {
-        throw error;
-      }
-    }
   };
 }; 

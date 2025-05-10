@@ -27,7 +27,8 @@
     "vee-validate": "^4.15.0",
     "vue": "latest",
     "vue-router": "latest",
-    "vue3-carousel": "^0.13.0"
+    "vue3-carousel": "^0.13.0",
+    "vue3-persian-datetime-picker": "^1.2.2"
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.13.1",

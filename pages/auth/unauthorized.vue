@@ -49,7 +49,7 @@ onMounted(() => {
       clearInterval(timer);
       redirectToLogin();
     }
-  }, 5000);
+  }, 1000);
 });
 
 onUnmounted(() => {
