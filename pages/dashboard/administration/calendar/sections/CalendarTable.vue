@@ -1,5 +1,9 @@
 <template>
     <div class="overflow-x-auto">
+        <!-- DatePicker Filter
+        <div class="mb-4">
+            <DatePicker v-model="selectedDate" />
+        </div> -->
         <div v-if="isLoading" class="text-center py-4">
             <Icon name="mdi:loading" class="animate-spin h-8 w-8 mx-auto text-blue-600" />
             <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
@@ -60,14 +64,15 @@
 import EditIcon from '../../../../../components/icons/EditIcon.vue';
 import TrashIcon from '../../../../../components/icons/TrashIcon.vue';
 import Pagination from '@/components/form/Pagination.vue';
+import DatePicker from '@/components/form/DatePicker.vue';
 import { type Calendar } from '@/services/administration/calendarService';
-import PersianDatePicker from 'vue3-persian-datetime-picker'
-import dayjs from 'dayjs'
-import jalaliday from 'jalaliday'
-dayjs.extend(jalaliday)
+import { ref } from 'vue';
+
+
+const selectedDate = ref('');
 
 const formatDate = (date: string) => {
-    return dayjs(date).calendar('jalali').locale('fa').format('YYYY/MM/DD');
+  return date; // چون PersianDatePicker خروجی شمسی می‌دهد
 };
 
 const updateCalendar = (calendar: Calendar) => {
@@ -101,6 +106,4 @@ const onPageChange = (page: number) => {
 const onPageSizeChange = (size: number) => {
     emit('pageSizeChange', size);
 };
-
-const PersianDatePicker = (await import('vue3-persian-datetime-picker')).default;
 </script>

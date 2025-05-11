@@ -68,4 +68,4 @@ export const createBaseService = (baseURL: string) => {
       throw error;
     }
   };
-}; 
+};

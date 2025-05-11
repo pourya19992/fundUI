@@ -30,4 +30,4 @@
 
 <script setup lang="ts">
 // Add any required logic here
-</script> 
+</script>

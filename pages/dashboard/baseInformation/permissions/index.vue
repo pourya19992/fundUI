@@ -127,7 +127,7 @@ const handleEdit = async (permission: Permission) => {
 
 const handleDelete = async (permission: Permission) => {
   if (!permission.id) return;
-  
+
   if (confirm('آیا از حذف این دسترسی اطمینان دارید؟')) {
     isLoading.value = true;
     try {

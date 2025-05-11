@@ -42,7 +42,7 @@ export const createBranchService = (baseURL: string) => {
   const { apiClient, handleError } = createBaseService(baseURL);
 
   return {
-    async getBranch(id: number): Promise<FundBranch> {
+    async getBranch(id: number): Promise<Branch> {
       try {
         const response = await apiClient.get(`/api/v1/administration/branch/${id}`);
         return response.data;
@@ -51,7 +51,7 @@ export const createBranchService = (baseURL: string) => {
       }
     },
 
-    async getBranches(): Promise<FundBranch[]> {
+    async getBranches(): Promise<Branch[]> {
       try {
         const response = await apiClient.get('/api/v1/administration/branch');
         return response.data;
@@ -60,7 +60,7 @@ export const createBranchService = (baseURL: string) => {
       }
     },
 
-    async addBranch(branch: FundBranchDto): Promise<ApiResponse> {
+    async addBranch(branch: BranchDto): Promise<ApiResponse> {
       try {
         const response = await apiClient.post('/api/v1/administration/branch/add', branch);
         return {
@@ -71,7 +71,7 @@ export const createBranchService = (baseURL: string) => {
       }
     },
 
-    async updateBranch(branch: FundBranchDto): Promise<ApiResponse> {
+    async updateBranch(branch: BranchDto): Promise<ApiResponse> {
       try {
         const payload = {
           ...branch,

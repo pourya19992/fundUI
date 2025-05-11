@@ -12,8 +12,14 @@ export type CalendarDto = Omit<Calendar, 'id'>;
 export const createCalendarService = (baseURL: string) => {
 const { apiClient, handleError } = createBaseService(baseURL);
 
+const form = ref<CalendarDto>({
+    calendarDate: '',
+    isOff: false,
+    isVacation: false,
+});
+
 return {
-    async getCalendarList(id?: number): Promise<Calendar[]> {
+    async getCalendarList(): Promise<Calendar[]> {
     try {
         const response = await apiClient.get(`/api/v1/administration/calendar`);
         return response.data;
@@ -60,6 +66,7 @@ return {
         console.error('Error deleting calendar:', error);
         throw handleError(error);
     }
-    }
+    },
+
 };
 };
