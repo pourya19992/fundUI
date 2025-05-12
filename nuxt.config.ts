@@ -8,7 +8,9 @@ export default defineNuxtConfig({
         'nuxt-icon'
     ],
 
-    css: ["~/assets/css/main.css"],
+    css: [
+        "~/assets/css/main.css"
+    ],
 
     runtimeConfig: {
         public: {
@@ -26,6 +28,13 @@ export default defineNuxtConfig({
     build: {
         transpile: ['vue']
     },
-    
+
+    app: {
+        head: {
+            charset: 'utf-8',
+            viewport: 'width=device-width, initial-scale=1'
+        }
+    },
+
     compatibilityDate: '2025-01-29'
 });

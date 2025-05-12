@@ -49,16 +49,19 @@
         </tr>
       </tbody>
     </table>
+
+            <!-- Pagination -->
+      <div class="mt-4">
+          <Pagination :current-page="currentPage" :total-pages="totalPages" :page-size="pageSize"
+              :on-page-change="onPageChange" :on-page-size-change="onPageSizeChange" />
+      </div>
   </div>
 </template>
 <script setup lang="ts">
 import EditIcon from '../../../../../components/icons/EditIcon.vue';
 import TrashIcon from '../../../../../components/icons/TrashIcon.vue';
-import { createBranchService } from '@/services/administration/branchService';
-import { useRuntimeConfig } from 'nuxt/app';
-
-const config = useRuntimeConfig();
-
+import Pagination from '@/components/form/Pagination.vue';
+import { type Branch } from '@/services/administration/branchService';
 
 const updateBranch = (branch: Branch) => {
   emit('edit', branch);
@@ -68,27 +71,29 @@ const deleteBranch = (branch: Branch) => {
   emit('delete', branch);
 };
 
-interface Branch {
-  id: number;
-  isActive: boolean;
-  code: string;
-  name: string;
-  manager: string;
-  phone: string;
-  fax: string;
-  cellPhone: string;
-  postalCode: string;
-  address: string;
-}
 
 defineProps<{
   branches: Branch[];
   isLoading: boolean;
   isDisabled: boolean;
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
 }>();
 
 const emit = defineEmits<{
   (e: 'edit', branch: Branch): void;
   (e: 'delete', branch: Branch): void;
+  (e: 'pageChange', page: number): void;
+  (e: 'pageSizeChange', size: number): void;
 }>();
-</script> 
+
+
+const onPageChange = (page: number) => {
+    emit('pageChange', page);
+};
+
+const onPageSizeChange = (size: number) => {
+    emit('pageSizeChange', size);
+};
+</script>

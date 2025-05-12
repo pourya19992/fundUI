@@ -59,8 +59,7 @@
 import { ref, watch } from "vue";
 import EditIcon from "~/components/icons/EditIcon.vue";
 import { useNotify } from "~/helpers/hooks/useNotify";
-import { useApi } from "~/services/api";
-import { PermissionData } from "~/services/authentication/type";
+
 
 // Define props with refetch function and permission data
 

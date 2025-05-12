@@ -1,14 +1,14 @@
 <template>
   <div v-if="!isSpecialPage" dir="rtl" class="h-full">
-    <!-- Sidebar -->
     <div v-show="isOpen"
-         class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-64 bg-white border-l">
-      <!-- لینک‌های داشبورد -->
+        class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-64 bg-white border-l">
       <nav class="p-5 text-right">
         <NuxtLink to="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-gray-100">داشبورد</NuxtLink>
         <NuxtLink to="/dashboard/profile" class="block py-3 px-4 rounded-lg hover:bg-gray-100">پروفایل</NuxtLink>
         <NuxtLink to="/dashboard/settings" class="block py-3 px-4 rounded-lg hover:bg-gray-100">تنظیمات</NuxtLink>
         <NuxtLink to="/dashboard/administration/branch" class="block py-3 px-4 rounded-lg hover:bg-gray-100">شعب</NuxtLink>
+        <NuxtLink to="/dashboard/administration/calendar" class="block py-3 px-4 rounded-lg hover:bg-gray-100">تقویم</NuxtLink>
+        <NuxtLink to="/dashboard/baseInformation/permissions" class="block py-3 px-4 rounded-lg hover:bg-gray-100">مجوزها</NuxtLink>
       </nav>
     </div>
   </div>

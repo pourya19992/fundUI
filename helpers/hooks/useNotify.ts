@@ -1,13 +1,23 @@
+import { ref } from 'vue';
+
 interface NotifyOptions {
   description: string;
   status: 'success' | 'error' | 'warning' | 'info';
   duration?: number;
 }
 
+// Create a global notification instance
+const notificationComponent = ref<any>(null);
+
 export const useNotify = () => {
   return (options: NotifyOptions) => {
-    // You can replace this with your preferred notification system
-    // For now, using console.log as a fallback
-    console.log(`[${options.status.toUpperCase()}] ${options.description}`);
+    if (notificationComponent.value) {
+      notificationComponent.value.addNotification(options.description, options.status);
+    }
   };
+};
+
+// Function to set the notification component instance
+export const setNotificationComponent = (component: any) => {
+  notificationComponent.value = component;
 }; 
