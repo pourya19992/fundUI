@@ -6,47 +6,13 @@
 
     <Modal :is-open="isOpen" @close="onClose">
     <template #body>
-        <div>
         <h3 class="text-center text-lg font-semibold mb-4">تقویم جدید</h3>
-        <div class="space-y-4">
-            <div>
-        <label class="block text-sm">تاریخ</label>
-        <input v-model="calendarDate" type="date" class="input-field" required />
-            </div>
-            <div>
-            <label class="block text-sm">تعطیل رسمی</label>
-            <select v-model="isOff" class="input-field">
-                <option :value="true">بله</option>
-                <option :value="false">خیر</option>
-            </select>
-            </div>
-            <div>
-            <label class="block text-sm">تعطیلات خاص</label>
-            <select v-model="isVacation" class="input-field">
-                <option :value="true">بله</option>
-                <option :value="false">خیر</option>
-            </select>
-            </div>
-        </div>
-        </div>
-    </template>
-
-    <template #footer>
-        <div class="flex justify-center gap-4">
-        <button 
-            @click="handleSubmit" 
-            class="btn-primary w-24"
-            :disabled="isLoading"
-        >
-            ثبت
-        </button>
-        <button 
-            @click="onClose" 
-            class="btn-secondary w-24"
-        >
-            انصراف
-        </button>
-        </div>
+        <CalendarForm
+            :model-value="formData"
+            :is-loading="isLoading"
+            @submit="handleSubmit"
+            @cancel="onClose"
+        />
     </template>
     </Modal>
 </div>
@@ -56,85 +22,72 @@
 import { ref } from "vue";
 import { createCalendarService } from "@/services/administration/calendarService";
 import Modal from "@/components/Modal.vue";
+import CalendarForm from "./CalendarForm.vue";
 import { useNotify } from "@/helpers/hooks/useNotify";
 import { useRuntimeConfig } from "nuxt/app";
 
-const props = defineProps({
-refetch: Function
-});
+const props = defineProps({ refetch: Function });
 
 const config = useRuntimeConfig();
 const calendarService = createCalendarService(config.public.apiBase);
 
 const isOpen = ref(false);
 const isLoading = ref(false);
-const calendarDate = ref("");
-const isOff = ref(false);
-const isVacation = ref(false);
 const editingId = ref<number | null>(null);
-
 const notify = useNotify();
 
+const formData = ref({
+    calendarDate: "",
+    isOff: false,
+    isVacation: false,
+});
+
 const onOpen = () => {
-isOpen.value = true;
+    isOpen.value = true;
+    editingId.value = null;
+    formData.value = { calendarDate: "", isOff: false, isVacation: false };
 };
 
 const onClose = () => {
-isOpen.value = false;
-resetForm();
+    isOpen.value = false;
+    editingId.value = null;
+    formData.value = { calendarDate: "", isOff: false, isVacation: false };
 };
 
-const resetForm = () => {
-editingId.value = null;
-calendarDate.value = "";
-isOff.value = false;
-isVacation.value = false;
-};
-
-const handleSubmit = async () => {
-if (!calendarDate.value) {
-    notify({ description: "تاریخ الزامی است.", status: "warning" });
-    return;
-}
-
-isLoading.value = true;
-try {
-    if (editingId.value) {
-    await calendarService.updateCalendar({
-        id: editingId.value,
-        calendarDate: calendarDate.value,
-        isOff: isOff.value,
-        isVacation: isVacation.value
-    });
-    notify({ description: "تقویم با موفقیت ویرایش شد.", status: "success" });
-    } else {
-    await calendarService.addCalendar({
-        calendarDate: calendarDate.value,
-        isOff: isOff.value,
-        isVacation: isVacation.value
-    });
-    notify({ description: "تقویم با موفقیت اضافه شد.", status: "success" });
+const handleSubmit = async (data: any) => {
+    if (!data.calendarDate) {
+        notify({ description: "تاریخ الزامی است.", status: "warning" });
+        return;
     }
-    props.refetch && props.refetch();
-    onClose();
-} catch (error: any) {
-    notify({ description: `خطا: ${error.message}`, status: "error" });
-} finally {
-    isLoading.value = false;
-}
+    isLoading.value = true;
+    try {
+        if (editingId.value) {
+            await calendarService.updateCalendar({ id: editingId.value, ...data });
+            notify({ description: "تقویم با موفقیت ویرایش شد.", status: "success" });
+        } else {
+            await calendarService.addCalendar(data);
+            notify({ description: "تقویم با موفقیت اضافه شد.", status: "success" });
+        }
+        props.refetch && props.refetch();
+        onClose();
+    } catch (error: any) {
+        notify({ description: `خطا: ${error.message}`, status: "error" });
+    } finally {
+        isLoading.value = false;
+    }
 };
 
 const openForEdit = (data: any) => {
-isOpen.value = true;
-editingId.value = data.id;
-calendarDate.value = data.calendarDate || "";
-isOff.value = !!data.isOff;
-isVacation.value = !!data.isVacation;
+    isOpen.value = true;
+    editingId.value = data.id;
+    formData.value = {
+        calendarDate: data.calendarDate || "",
+        isOff: !!data.isOff,
+        isVacation: !!data.isVacation,
+    };
 };
 
-defineExpose({
-openForEdit
-});
+defineExpose({ openForEdit });
 </script>
 
 <style scoped>

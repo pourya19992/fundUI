@@ -31,20 +31,14 @@ interface ApiResponse {
   data?: any;
 }
 
-interface ApiErrorResponse {
-  code: string;
-  message: string;
-  uuid: string | null;
-  time: string;
-}
-
+const API_URL = '/api/v1/administration/branch';
 export const createBranchService = (baseURL: string) => {
   const { apiClient, handleError } = createBaseService(baseURL);
 
   return {
     async getBranch(id: number): Promise<Branch> {
       try {
-        const response = await apiClient.get(`/api/v1/administration/branch/${id}`);
+        const response = await apiClient.get(`${API_URL}/${id}`);
         return response.data;
       } catch (error) {
         return handleError(error);
@@ -53,7 +47,7 @@ export const createBranchService = (baseURL: string) => {
 
     async getBranches(): Promise<Branch[]> {
       try {
-        const response = await apiClient.get('/api/v1/administration/branch');
+        const response = await apiClient.get(API_URL);
         return response.data;
       } catch (error) {
         return handleError(error);
@@ -62,7 +56,7 @@ export const createBranchService = (baseURL: string) => {
 
     async addBranch(branch: BranchDto): Promise<ApiResponse> {
       try {
-        const response = await apiClient.post('/api/v1/administration/branch/add', branch);
+        const response = await apiClient.post(API_URL, branch);
         return {
           message: response.data.message || 'شعبه با موفقیت اضافه شد'
         };
@@ -77,8 +71,8 @@ export const createBranchService = (baseURL: string) => {
           ...branch,
           id: typeof branch.id === 'string' ? parseInt(branch.id) : branch.id
         };
-        
-        const response = await apiClient.put('/api/v1/administration/branch/edit', payload);
+
+        const response = await apiClient.put(`${API_URL}/edit`, payload);
         return {
           message: response.data.message || 'شعبه با موفقیت ویرایش شد'
         };
@@ -89,10 +83,10 @@ export const createBranchService = (baseURL: string) => {
 
     async deleteBranch(branchId: number): Promise<void> {
       try {
-        await apiClient.delete(`/api/v1/administration/branch/remove/${branchId}`);
+        await apiClient.delete(`${API_URL}/remove/${branchId}`);
       } catch (error) {
         handleError(error);
       }
     }
   };
-}; 
+};

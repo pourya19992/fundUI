@@ -6,7 +6,7 @@
       :type="notification.type"
       @close="closeNotification"
     />
-    
+
     <div class="bg-white rounded-lg shadow p-6">
       <h2 class="text-2xl font-bold mb-6">مدیریت دسترسی‌ها</h2>
 
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { usePermissionService } from '@/services/permissionService';
+import { createPermissionService } from '@/services/permissionService';
 import Notification from '@/components/form/Notification.vue';
 import EditPermission from './sections/EditPermission.vue';
 import PermissionTable from './sections/PermissionTable.vue';
@@ -51,7 +51,7 @@ interface NotificationState {
   type: 'success' | 'error';
 }
 
-const permissionService = usePermissionService();
+const permissionService = createPermissionService(import.meta.env.VITE_API_URL);
 const permissions = ref<Permission[]>([]);
 const selectedPermission = ref<Permission | undefined>();
 const isLoading = ref(false);

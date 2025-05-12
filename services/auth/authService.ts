@@ -21,13 +21,6 @@ export interface AuthResponse {
   // Add other response fields as needed
 }
 
-interface ApiErrorResponse {
-  code: string;
-  message: string;
-  uuid: string | null;
-  time: string;
-}
-
 export const createAuthService = () => {
   const { apiClient, handleError } = createBaseService(BASE_URL);
 
@@ -54,7 +47,7 @@ export const createAuthService = () => {
         const response = await apiClient.post<string>('/login', loginDto);
         const token = response.data;
         localStorage.setItem(ACCESS_TOKEN_NAME, token);
-        
+
         return token;
       } catch (error) {
         return handleError(error);
@@ -83,6 +76,6 @@ export const createAuthService = () => {
     getToken(): string | null {
       return localStorage.getItem(ACCESS_TOKEN_NAME);
     },
-    
+
   };
-}; 
+};

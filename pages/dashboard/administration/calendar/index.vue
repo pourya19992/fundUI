@@ -1,7 +1,6 @@
 <template>
   <div class="container mx-auto p-4" dir="rtl">
     <Notification ref="notificationRef" />
-    
     <div class="bg-white rounded-lg shadow p-6">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">مدیریت تقویم</h2>

@@ -1,9 +1,5 @@
 <template>
     <div class="overflow-x-auto">
-        <!-- DatePicker Filter
-        <div class="mb-4">
-            <DatePicker v-model="selectedDate" />
-        </div> -->
         <div v-if="isLoading" class="text-center py-4">
             <Icon name="mdi:loading" class="animate-spin h-8 w-8 mx-auto text-blue-600" />
             <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
@@ -64,15 +60,11 @@
 import EditIcon from '../../../../../components/icons/EditIcon.vue';
 import TrashIcon from '../../../../../components/icons/TrashIcon.vue';
 import Pagination from '@/components/form/Pagination.vue';
-import DatePicker from '@/components/form/DatePicker.vue';
 import { type Calendar } from '@/services/administration/calendarService';
-import { ref } from 'vue';
 
-
-const selectedDate = ref('');
 
 const formatDate = (date: string) => {
-  return date; // چون PersianDatePicker خروجی شمسی می‌دهد
+return date;
 };
 
 const updateCalendar = (calendar: Calendar) => {

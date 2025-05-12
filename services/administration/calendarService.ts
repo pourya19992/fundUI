@@ -9,6 +9,8 @@ isVacation: boolean;
 
 export type CalendarDto = Omit<Calendar, 'id'>;
 
+const API_URL = '/api/v1/administration/calendar';
+
 export const createCalendarService = (baseURL: string) => {
 const { apiClient, handleError } = createBaseService(baseURL);
 
@@ -21,7 +23,7 @@ const form = ref<CalendarDto>({
 return {
     async getCalendarList(): Promise<Calendar[]> {
     try {
-        const response = await apiClient.get(`/api/v1/administration/calendar`);
+        const response = await apiClient.get(API_URL);
         return response.data;
     } catch (error) {
         console.error('Error fetching calendar list:', error);
@@ -31,7 +33,7 @@ return {
 
     async getCalendar(id: number): Promise<Calendar> {
     try {
-        const response = await apiClient.get(`/api/v1/administration/calendar/${id}`);
+        const response = await apiClient.get(`${API_URL}/${id}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching calendar:', error);
@@ -41,7 +43,7 @@ return {
 
     async addCalendar(calendar: CalendarDto): Promise<Calendar> {
     try {
-        const response = await apiClient.post('/api/v1/administration/calendar', calendar);
+        const response = await apiClient.post(API_URL, calendar);
         return response.data;
     } catch (error) {
         console.error('Error adding calendar:', error);
@@ -51,7 +53,7 @@ return {
 
     async updateCalendar(calendar: Calendar): Promise<Calendar> {
     try {
-        const response = await apiClient.put(`/api/v1/administration/calendar/${calendar.id}`, calendar);
+        const response = await apiClient.put(`${API_URL}/${calendar.id}`, calendar);
         return response.data;
     } catch (error) {
         console.error('Error updating calendar:', error);
@@ -61,7 +63,7 @@ return {
 
     async deleteCalendar(id: number): Promise<void> {
     try {
-        await apiClient.delete(`/api/v1/administration/calendar/${id}`);
+        await apiClient.delete(`${API_URL}/${id}`);
     } catch (error) {
         console.error('Error deleting calendar:', error);
         throw handleError(error);

@@ -19,6 +19,7 @@ interface ApiErrorResponse {
   time: string;
 }
 
+const API_URL = '/api/v1/administration/fund';
 export const createFundService = (baseURL: string) => {
 
   const { apiClient, handleError } = createBaseService(baseURL);
@@ -27,8 +28,8 @@ export const createFundService = (baseURL: string) => {
     async getFundList(fundId?: number): Promise<Fund[]> {
       try {
         const url = fundId
-          ? `/api/v1/administration/fund/${fundId}`
-          : '/api/v1/administration/fund';
+          ? `${API_URL}/${fundId}`
+          : API_URL;
         const response = await apiClient.get(url);
         return response.data;
       } catch (error) {
@@ -38,7 +39,7 @@ export const createFundService = (baseURL: string) => {
 
     async addFund(fund: FundDto): Promise<void> {
       try {
-        await apiClient.post('/api/v1/administration/fund/add', fund);
+        await apiClient.post(API_URL, fund);
       } catch (error) {
         throw handleError(error);
       }
@@ -46,7 +47,7 @@ export const createFundService = (baseURL: string) => {
 
     async updateFund(fund: FundDto): Promise<void> {
       try {
-        await apiClient.put('/api/v1/administration/fund/edit', fund);
+        await apiClient.put(`${API_URL}/edit`, fund);
       } catch (error) {
         throw handleError(error);
       }
@@ -54,7 +55,7 @@ export const createFundService = (baseURL: string) => {
 
     async deleteFund(fundId: number): Promise<void> {
       try {
-        await apiClient.delete(`/api/v1/administration/fund/remove/${fundId}`);
+        await apiClient.delete(`${API_URL}/remove/${fundId}`);
       } catch (error) {
         throw handleError(error);
       }

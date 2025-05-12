@@ -79,33 +79,6 @@ export const createRoleService = (baseURL: string) => {
       }
     },
 
-    // Permission operations
-    async addPermission(permission: PermissionDto): Promise<void> {
-      try {
-        await apiClient.post('/api/v1/authentication/permission/add', permission);
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async updatePermission(permission: PermissionDto): Promise<void> {
-      try {
-        await apiClient.put('/api/v1/authentication/permission/edit', permission);
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async deletePermission(permissionId: number): Promise<void> {
-      try {
-        await apiClient.delete('/api/v1/authentication/permission/remove', {
-          params: { permissionId }
-        });
-      } catch (error) {
-        throw error;
-      }
-    },
-
     // Role assignments
     async assignRoleToUserGroup(assignments: RoleUserGroupDto[]): Promise<void> {
       try {
@@ -123,4 +96,4 @@ export const createRoleService = (baseURL: string) => {
       }
     }
   };
-}; 
+};
