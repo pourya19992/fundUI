@@ -5,7 +5,7 @@ export default defineNuxtConfig({
         '@nuxtjs/tailwindcss',
         '@pinia/nuxt',
         '@vueuse/nuxt',
-        'nuxt-icon'
+        '@nuxt/icon'
     ],
 
     css: [
@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     },
 
     build: {
-        transpile: ['vue']
+        transpile: ['vue', '@vueuse/core']
     },
 
     app: {
@@ -34,6 +34,36 @@ export default defineNuxtConfig({
             charset: 'utf-8',
             viewport: 'width=device-width, initial-scale=1'
         }
+    },
+
+    nitro: {
+        prerender: {
+            crawlLinks: true,
+            routes: ['/']
+        }
+    },
+
+    experimental: {
+        payloadExtraction: false
+    },
+
+    typescript: {
+        strict: true,
+        typeCheck: true,
+        shim: false
+    },
+
+    components: {
+        dirs: [
+            '~/components',
+            '~/components/form',
+            '~/components/table',
+            '~/components/icons'
+        ]
+    },
+
+    imports: {
+        dirs: ['composables/**', 'utils/**']
     },
 
     compatibilityDate: '2025-01-29'

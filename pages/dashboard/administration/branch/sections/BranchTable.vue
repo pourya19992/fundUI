@@ -4,7 +4,7 @@
       <Icon name="mdi:loading" class="animate-spin h-8 w-8 mx-auto text-blue-600" />
       <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
     </div>
-    
+
     <table v-else class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>

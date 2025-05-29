@@ -1,48 +1,75 @@
 <template>
-  <header class="bg-white shadow-md sticky top-0 z-40">
-    <div class="container mx-auto flex justify-between items-center py-4 px-6">
-      <!-- Right side - Hamburger and Navigation -->
-      <div class="flex items-center gap-8">
-        <BurgerMenuIcon
-          v-if="!isSpecialPage"
-          @click="toggleSidebar"
-        />
+  <header class="bg-white shadow-md sticky top-0 z-40 relative">
+    <div class="absolute right-0 top-0 flex items-center gap-4 h-full px-4">
+      <BurgerMenuIcon
+        v-if="!isSpecialPage"
+        @click="toggleSidebar"
+        class="cursor-pointer"
+      />
 
-        <button 
-          v-if="!isSpecialPage && showBackButton"
-          @click="goBack" 
-          class="p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300"
-          aria-label="Go Back"
-        >
-          <BackIcon class="w-6 h-6"/>
-        </button>
+      <button
+        v-if="!isSpecialPage && showBackButton"
+        @click="goBack"
+        class="p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300"
+        aria-label="Go Back"
+      >
+        <BackIcon class="w-6 h-6"/>
+      </button>
 
-        <nav>
-          <ul class="flex gap-8">
-            <li>
-              <button
-                @click="goToHome"
-                class="p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300"
-              >
-                <HomeIcon class="h-6 w-6" />
-              </button>
-            </li>
-            <li>
-              <button
-                @click="handleLogout"
-                class="p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300"
-              >
-                <ExitIcon class="h-6 w-6" />
-              </button>
-            </li>
-            <!-- <li><NuxtLink to="/support" class="text-gray-600 hover:text-blue-600 px-2">پشتیبانی</NuxtLink></li> -->
-          </ul>
-        </nav>
-      </div>
-
-      <!-- Left side - Logo -->
-      <h1 class="text-xl font-bold text-blue-600">صندوق سرمایه گذاری</h1>
+      <!-- Desktop Menu -->
+      <nav class="hidden md:block">
+        <ul class="flex gap-8">
+          <li>
+            <button
+              @click="goToHome"
+              class="p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300"
+            >
+              <HomeIcon class="h-6 w-6" />
+            </button>
+          </li>
+          <li>
+            <button
+              @click="handleLogout"
+              class="p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300"
+            >
+              <ExitIcon class="h-6 w-6" />
+            </button>
+          </li>
+        </ul>
+      </nav>
     </div>
+    <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <div class="flex-1 flex justify-end">
+        <h1 class="text-xl font-bold text-blue-600">صندوق سرمایه گذاری</h1>
+      </div>
+    </div>
+    <!-- Mini Sidebar (Always, when sidebar is closed) -->
+    <transition name="fade">
+      <div
+        v-if="!isSpecialPage && !appStore.sidebarOpen"
+        class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-16 bg-white border-l flex flex-col items-center justify-start py-4 gap-6 shadow-lg z-40"
+        style="transition: width 0.3s;"
+        @click="toggleSidebar"
+        @mouseenter="appStore.sidebarOpen = true"
+        @mouseleave="appStore.sidebarOpen = false"
+      >
+        <button @click.stop="() => router.push('/dashboard')" class="btn-menu" aria-label="داشبورد">
+          <ReportIcon class="h-6 w-6" />
+        </button>
+        <button @click.stop="() => router.push('/dashboard/profile')" class="btn-menu" aria-label="پروفایل">
+          <ProfileIcon class="h-6 w-6 text-gray-600" />
+        </button>
+        <button @click.stop="() => router.push('/dashboard/settings')" class="btn-menu" aria-label="تنظیمات">
+          <GearIcon class="h-6 w-6 text-gray-600" />
+        </button>
+        <button @click.stop="() => router.push('/dashboard/administration/branch')" class="btn-menu" aria-label="شعب">
+          <SheetIcon class="h-6 w-6 text-gray-600" />
+        </button>
+        <button @click.stop="() => router.push('/dashboard/administration/calendar')" class="btn-menu" aria-label="تقویم">
+          <SheetIcon class="h-6 w-6 text-gray-600" />
+        </button>
+      </div>
+    </transition>
   </header>
   <!-- Floating Support Button and Chat -->
   <div>
@@ -68,7 +95,7 @@
         </div>
         <div class="flex-1 p-4 overflow-y-auto">
           <div v-for="(message, index) in messages" :key="index"
-               :class="['mb-4', message.isUser ? 'text-left' : 'text-right']">
+              :class="['mb-4', message.isUser ? 'text-left' : 'text-right']">
             <div :class="[
               'inline-block p-3 rounded-lg max-w-[80%]',
               message.isUser ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-900'
@@ -108,7 +135,11 @@ import BurgerMenuIcon from '../../components/icons/BurgerMenuIcon.vue';
 import ExitIcon from '../../components/icons/ExitIcon.vue';
 import BackIcon from '../../components/icons/BackIcon.vue';
 import Supporter from '../../components/icons/SupporterIcon.vue';
+import GearIcon from '../../components/icons/GearIcon.vue';
+import SheetIcon from '../../components/icons/SheetIcon.vue';
 import { createAuthService } from '../../services/auth/authService';
+import ReportIcon from '../icons/ReportIcon.vue';
+import ProfileIcon from '../icons/ProfileIcon.vue';
 
 
 const route = useRoute();
@@ -188,5 +219,22 @@ nav a {
 .slide-left-enter-from, .slide-left-leave-to {
   transform: translateX(-120%);
   opacity: 0;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  nav.md\:block {
+    display: none !important;
+  }
+}
+
+.btn-menu {
+  @apply p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300;
 }
 </style>

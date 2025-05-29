@@ -1,7 +1,10 @@
 <template>
   <div v-if="!isSpecialPage" dir="rtl" class="h-full">
     <div v-show="isOpen"
-        class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-64 bg-white border-l">
+        class="fixed top-16 right-0 h-[calc(100vh-4rem)] w-64 bg-white border-l"
+        @mouseenter="appStore.sidebarOpen = true"
+        @mouseleave="appStore.sidebarOpen = false"
+    >
       <nav class="p-5 text-right">
         <NuxtLink to="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-gray-100">داشبورد</NuxtLink>
         <NuxtLink to="/dashboard/profile" class="block py-3 px-4 rounded-lg hover:bg-gray-100">پروفایل</NuxtLink>

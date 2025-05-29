@@ -1,10 +1,11 @@
 <template>
-  <div class="container mx-auto p-4" dir="rtl">
+  <div class="w-full bg-white rounded-lg shadow mr-6" dir="rtl">
+  <!-- <div class="w-full bg-white rounded-lg shadow mr-6" dir="rtl"> -->
     <Notification ref="notificationRef" />
     <div class="bg-white rounded-lg shadow p-6">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">مدیریت تقویم</h2>
-        <AddCalendar
+        <CalendarForm
           ref="calendarFormRef"
           :refetch="fetchCalendars"
         />
@@ -23,10 +24,6 @@
         @pageChange="handlePageChange"
         @pageSizeChange="handlePageSizeChange"
       />
-
-      <Modal>
-        <CalendarForm ref="calendarFormRef" @submit="handleFormSubmit" />
-      </Modal>
     </div>
   </div>
 </template>
@@ -37,9 +34,7 @@ import { createCalendarService, type Calendar, type CalendarDto } from '@/servic
 import Notification from '@/components/Notification.vue';
 import CalendarTable from './sections/CalendarTable.vue';
 import { useNotify, setNotificationComponent } from '@/helpers/hooks/useNotify';
-import AddCalendar from './sections/AddCalendar.vue';
 import CalendarForm from './sections/CalendarForm.vue';
-import Modal from '@/components/Modal.vue';
 
 const calendars = ref<Calendar[]>([]);
 const loading = ref(false);

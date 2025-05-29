@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-4" dir="rtl">
+  <div class="w-full bg-white rounded-lg shadow mr-6" dir="rtl">
     <Notification
       :show="notification.show"
       :message="notification.message"
@@ -7,36 +7,38 @@
       @close="closeNotification"
     />
 
-    <div class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-2xl font-bold mb-6">مدیریت دسترسی‌ها</h2>
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">مدیریت دسترسی‌ها</h2>
+        <PermissionForm
+          ref="permissionFormRef"
+          @submit="loadPermissions"
+        />
+      </div>
 
-      <!-- Edit Permission Form -->
-      <EditPermission
-        :permission="selectedPermission"
-        :is-loading="isLoading"
-        class="mb-8"
-        @submit="handleSubmit"
-        @cancel="resetForm"
-      />
-
-      <!-- Permissions Table -->
       <PermissionTable
-        :permissions="permissions"
+        :permissions="paginatedPermissions"
         :is-loading="isLoadingList"
         :is-disabled="isLoading"
+        :currentPage="currentPage"
+        :totalPages="totalPages"
+        :pageSize="pageSize"
         @edit="handleEdit"
         @delete="handleDelete"
+        @pageChange="handlePageChange"
+        @pageSizeChange="handlePageSizeChange"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { createPermissionService } from '@/services/permissionService';
 import Notification from '@/components/form/Notification.vue';
-import EditPermission from './sections/EditPermission.vue';
 import PermissionTable from './sections/PermissionTable.vue';
+import PermissionForm from './sections/PermissionForm.vue';
+import { BASE_URL } from '@/utils/constants';
 
 interface Permission {
   id?: number;
@@ -51,17 +53,29 @@ interface NotificationState {
   type: 'success' | 'error';
 }
 
-const permissionService = createPermissionService(import.meta.env.VITE_API_URL);
+const permissionService = createPermissionService(BASE_URL);
 const permissions = ref<Permission[]>([]);
 const selectedPermission = ref<Permission | undefined>();
 const isLoading = ref(false);
 const isLoadingList = ref(false);
-
 const notification = ref<NotificationState>({
   show: false,
   message: '',
   type: 'success'
 });
+
+const currentPage = ref(0);
+const pageSize = ref(10);
+
+const totalPages = computed(() => Math.ceil(permissions.value.length / pageSize.value));
+
+const paginatedPermissions = computed(() => {
+  const start = currentPage.value * pageSize.value;
+  const end = start + pageSize.value;
+  return permissions.value.slice(start, end);
+});
+
+const permissionFormRef = ref<InstanceType<typeof PermissionForm> | null>(null);
 
 const showNotification = (message: string, type: 'success' | 'error') => {
   notification.value = {
@@ -95,30 +109,12 @@ const loadPermissions = async () => {
   }
 };
 
-const handleSubmit = async (formData: Permission) => {
-  isLoading.value = true;
-  try {
-    if (formData.id) {
-      await permissionService.updatePermission(formData);
-      showNotification('دسترسی با موفقیت ویرایش شد', 'success');
-    } else {
-      await permissionService.addPermission(formData);
-      showNotification('دسترسی با موفقیت اضافه شد', 'success');
-    }
-    resetForm();
-    await loadPermissions();
-  } catch (error) {
-    console.error('Error saving permission:', error);
-    showNotification('خطا در ذخیره‌سازی دسترسی', 'error');
-  } finally {
-    isLoading.value = false;
-  }
-};
-
 const handleEdit = async (permission: Permission) => {
   try {
     const data = await permissionService.getPermissionById(permission.id!);
-    selectedPermission.value = data;
+    if (data && permissionFormRef.value) {
+      permissionFormRef.value.openForEdit(data);
+    }
   } catch (error) {
     console.error('Error loading permission details:', error);
     showNotification('خطا در بارگذاری اطلاعات دسترسی', 'error');
@@ -143,6 +139,16 @@ const handleDelete = async (permission: Permission) => {
   }
 };
 
+const handlePageChange = (page: number) => {
+  currentPage.value = page;
+};
+
+const handlePageSizeChange = (size: number) => {
+  pageSize.value = size;
+  currentPage.value = 0;
+};
+
+
 onMounted(() => {
   loadPermissions();
 });
@@ -150,6 +156,7 @@ onMounted(() => {
 definePageMeta({
   layout: 'default'
 });
+
 </script>
 
 <style scoped>
