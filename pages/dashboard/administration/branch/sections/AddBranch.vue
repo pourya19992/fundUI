@@ -47,15 +47,15 @@
 
       <template #footer>
         <div class="flex justify-center gap-4">
-          <button 
-            @click="handleSubmit" 
+          <button
+            @click="handleSubmit"
             class="btn-primary w-24"
             :disabled="isLoading"
           >
             ثبت
           </button>
-          <button 
-            @click="onClose" 
+          <button
+            @click="onClose"
             class="btn-secondary w-24"
           >
             انصراف
@@ -132,7 +132,7 @@ const handleSubmit = async () => {
       postalCode: postalCode.value,
       address: address.value
     });
-    
+
     props.refetch();
     onClose();
     notify({ description: "شعبه با موفقیت اضافه شد.", status: "success" });
@@ -156,4 +156,4 @@ const handleSubmit = async () => {
 .btn-secondary {
   @apply bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition-colors;
 }
-</style> 
+</style>

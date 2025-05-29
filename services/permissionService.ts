@@ -2,7 +2,7 @@ import { createBaseService } from './baseService';
 
 const API_URL = '/api/v1/authentication/permission';
 
-interface Permission {
+export interface Permission {
   id?: number;
   name: string;
   url: string;
@@ -20,7 +20,7 @@ export const createPermissionService = (baseURL: string) => {
   return {
     async getAllPermissions() {
       try {
-        const response = await apiClient.get(`${API_URL}/list`);
+        const response = await apiClient.get(`${API_URL}`);
         return response.data;
       } catch (error) {
         return handleError(error);

@@ -1,8 +1,8 @@
 <template>
-  <div class="container mx-auto p-4" dir="rtl">
+  <div class="w-full bg-white rounded-lg shadow mr-6" dir="rtl">
     <Notification ref="notificationRef" />
-    
-    <div class="bg-white rounded-lg shadow p-6">
+
+    <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold">مدیریت شعب</h2>
         <BranchForm
@@ -110,7 +110,7 @@ const handleEdit = async (branch: Branch) => {
 
 const handleDelete = async (branch: Branch) => {
   if (!branch.id) return;
-  
+
   if (confirm('آیا از حذف این شعبه اطمینان دارید؟')) {
     isLoading.value = true;
     try {
@@ -148,4 +148,4 @@ definePageMeta({
 .container {
   max-width: 1200px;
 }
-</style> 
+</style>
