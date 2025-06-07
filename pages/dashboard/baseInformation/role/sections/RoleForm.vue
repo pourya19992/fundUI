@@ -1,40 +1,20 @@
 <template>
   <div>
     <button v-if="!isEditMode" @click="onOpen" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-      مجوز جدید
+      نقش جدید
     </button>
-
     <Modal :is-open="isOpen" @close="onClose">
       <template #body>
         <div>
           <h3 class="text-center text-lg font-semibold mb-4">{{ isEditMode ? 'ویرایش مجوز' : 'مجوز جدید' }}</h3>
           <div class="space-y-4">
             <div>
-              <label class="block text-sm">آدرس مجوز</label>
-              <input
-                  v-model="form.url"
-                  type="text"
-                  class="input-field"
-              />
-            </div>
-            <div>
-              <label class="block text-sm">نام مجوز</label>
+              <label class="block text-sm">نام نقش</label>
               <input
                   v-model="form.name"
                   type="text"
                   class="input-field"
               />
-            </div>
-
-            <!-- Add Is Sensitive field -->
-            <div class="flex items-center">
-              <input
-                  id="isSensitive"
-                  type="checkbox"
-                  v-model="form.isSensitive"
-                  class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-              />
-              <label for="isSensitive" class="ml-2 block text-sm text-gray-900">حساس</label>
             </div>
 
           </div>
@@ -66,13 +46,13 @@
 import { ref, reactive, defineExpose, watch } from "vue";
 import Modal from "@/components/Modal.vue";
 import { useNotify } from "@/helpers/hooks/useNotify";
-import { createPermissionService } from '@/services/baseInformation/permissionService';
+import { createRoleService } from '@/services/baseInformation/roleService';
 import { useRuntimeConfig } from "nuxt/app";
 
 const emit = defineEmits(['submit']);
 const notify = useNotify();
 const config = useRuntimeConfig();
-const permissionService = createPermissionService(config.public.apiBase);
+const roleService = createRoleService(config.public.apiBase);
 
 const isOpen = ref(false);
 const isLoading = ref(false);
@@ -111,20 +91,20 @@ const resetForm = () => {
 };
 
 const handleSubmit = async () => {
-  if (!form.name || !form.url) {
+  if (!form.name) {
     notify({ description: "تمام فیلدها باید پر شوند.", status: "warning" });
     return;
   }
   isLoading.value = true;
   try {
     if (form.id) {
-      await permissionService.updatePermission(form as any);
-      notify({ description: "مجوز با موفقیت ویرایش شد.", status: "success" });
+      await roleService.updateRole(form.id, form as any);
+      notify({ description: "نقش با موفقیت ویرایش شد.", status: "success" });
     } else {
-      await permissionService.addPermission(form as any);
-      notify({ description: "مجوز با موفقیت اضافه شد.", status: "success" });
+      await roleService.addRole(form as any);
+      notify({ description: "نقش با موفقیت اضافه شد.", status: "success" });
     }
-    emit('submit'); // Notify parent to refetch data
+    emit('submit');
     onClose();
   } catch (error: any) {
     notify({ description: `خطا: ${error.message}`, status: "error" });

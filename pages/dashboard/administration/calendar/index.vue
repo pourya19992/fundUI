@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-white rounded-lg shadow mr-6" dir="rtl">
+  <div class="w-full bg-white rounded-lg shadow mr-8" dir="rtl">
   <!-- <div class="w-full bg-white rounded-lg shadow mr-6" dir="rtl"> -->
     <Notification ref="notificationRef" />
     <div class="bg-white rounded-lg shadow p-6">

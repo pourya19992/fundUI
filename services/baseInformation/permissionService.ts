@@ -1,4 +1,4 @@
-import { createBaseService } from './baseService';
+import { createBaseService } from '../baseService';
 
 const API_URL = '/api/v1/authentication/permission';
 
@@ -61,9 +61,7 @@ export const createPermissionService = (baseURL: string) => {
 
     async deletePermission(permissionId: number): Promise<void> {
       try {
-        await apiClient.delete(`${API_URL}/remove`, {
-          params: { permissionId }
-        });
+        await apiClient.delete(`${API_URL}/remove/${permissionId}`);
       } catch (error) {
         handleError(error);
       }

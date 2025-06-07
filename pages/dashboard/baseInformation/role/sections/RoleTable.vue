@@ -9,39 +9,37 @@
       <thead class="bg-gray-50">
         <tr>
           <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">نام</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">حساس</th>
           <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">عملیات</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <tr v-for="permission in permissions" :key="permission.id">
-          <td class="px-6 py-4 whitespace-nowrap">{{ permission.name }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{{ permission.url }}</td>
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span :class="permission.isSensitive ? 'text-red-600' : 'text-green-600'">
-              {{ permission.isSensitive ? 'بله' : 'خیر' }}
-            </span>
+        <tr v-for="role in roles" :key="role.id">
+          <td class="px-6 py-4 whitespace-nowrap">{{ role.name }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-left">
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-left">
             <div class="flex items-center gap-2">
-              <EditIcon @click="$emit('edit', permission)" :disabled="isDisabled"
+              <EditIcon @click="$emit('edit', role)" :disabled="isDisabled"
                 class="disabled:opacity-50 cursor-pointer" />
-              <TrashIcon @click="$emit('delete', permission)" :disabled="isDisabled"
+              <TrashIcon @click="$emit('delete', role)" :disabled="isDisabled"
                 class="disabled:opacity-50 cursor-pointer" />
             </div>
           </td>
         </tr>
-        <tr v-if="permissions.length === 0">
+        <tr v-if="roles.length === 0">
           <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-            هیچ دسترسی یافت نشد
+            هیچ نقش یافت نشد
           </td>
         </tr>
       </tbody>
     </table>
     <div class="mt-4">
-          <Pagination :current-page="currentPage" :total-pages="totalPages" :page-size="pageSize"
-              :on-page-change="onPageChange" :on-page-size-change="onPageSizeChange" />
+          <Pagination
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          :page-size="pageSize"
+          :on-page-change="onPageChange"
+          :on-page-size-change="onPageSizeChange" />
       </div>
   </div>
 </template>
@@ -49,11 +47,11 @@
 <script setup lang="ts">
 import EditIcon from "@/components/icons/EditIcon.vue";
 import TrashIcon from "@/components/icons/TrashIcon.vue";
-import { type Permission } from '@/services/baseInformation/permissionService';
+import { type Role } from '@/services/baseInformation/roleService';
 import Pagination from '@/components/form/Pagination.vue';
 
 defineProps<{
-  permissions: Permission[];
+  roles: Role[];
   isLoading: boolean;
   isDisabled: boolean;
   currentPage: number;
@@ -62,8 +60,8 @@ defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'edit', permission: Permission): void;
-  (e: 'delete', permission: Permission): void;
+  (e: 'edit', role: Role): void;
+  (e: 'delete', role: Role): void;
   (e: 'pageChange', page: number): void;
   (e: 'pageSizeChange', size: number): void;
 }>();
@@ -75,4 +73,8 @@ const onPageChange = (page: number) => {
 const onPageSizeChange = (size: number) => {
     emit('pageSizeChange', size);
 };
+
 </script>
+
+<style scoped>
+</style>
