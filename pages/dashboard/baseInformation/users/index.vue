@@ -9,15 +9,15 @@
 
     <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">مدیریت نقش‌ها</h2>
-        <RoleForm
-        ref="roleFormRef"
-        @submit="loadRoles"
+        <h2 class="text-2xl font-bold">مدیریت کاربران</h2>
+        <UserForm
+        ref="userFormRef"
+        @submit="loadUsers"
         />
     </div>
 
-    <RoleTable
-        :roles="paginatedRoles"
+    <UserTable
+        :users="paginatedUsers"
         :is-loading="isLoadingList"
         :is-disabled="isLoading"
         :current-page="currentPage"
@@ -34,12 +34,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { createRoleService } from '@/services/baseInformation/roleService';
+import { createUserService } from '@/services/auth/userService';
 import Notification from '@/components/form/Notification.vue';
-import RoleTable from './sections/RoleTable.vue';
-import RoleForm from './sections/RoleForm.vue';
+import UserTable from './sections/UserTable.vue';
+import UserForm from './sections/UserForm.vue';
 import { useRuntimeConfig } from "nuxt/app";
-import type { Role } from "@/services/baseInformation/roleService";
+import type { User } from "@/services/auth/userService";
 import { useNotify } from '@/helpers/hooks/useNotify';
 
 interface NotificationState {
@@ -50,9 +50,9 @@ type: 'success' | 'error';
 
 const notify = useNotify();
 const config = useRuntimeConfig();
-const roleService = createRoleService(config.public.apiBase);
+const userService = createUserService(config.public.apiBase);
 
-const roles = ref<Role[]>([]);
+const users = ref<User[]>([]);
 const isLoading = ref(false);
 const isLoadingList = ref(false);
 const notification = ref<NotificationState>({
@@ -64,15 +64,15 @@ type: 'success'
 const currentPage = ref(0);
 const pageSize = ref(10);
 
-const totalPages = computed(() => Math.ceil(roles.value.length / pageSize.value));
+const totalPages = computed(() => Math.ceil(users.value.length / pageSize.value));
 
-const paginatedRoles = computed(() => {
-  const start = currentPage.value * pageSize.value;
+const paginatedUsers = computed(() => {
+const start = currentPage.value * pageSize.value;
 const end = start + pageSize.value;
-return roles.value.slice(start, end);
+return users.value.slice(start, end);
 });
 
-const roleFormRef = ref<InstanceType<typeof RoleForm> | null>(null);
+const userFormRef = ref<InstanceType<typeof UserForm> | null>(null);
 
 const showNotification = (message: string, type: 'success' | 'error') => {
 notification.value = {
@@ -89,43 +89,43 @@ const closeNotification = () => {
 notification.value.show = false;
 };
 
-const loadRoles = async () => {
+const loadUsers = async () => {
 isLoadingList.value = true;
 try {
-    const data = await roleService.getAllRoles();
-    roles.value = data;
+    const data = await userService.getAllUsers();
+    users.value = data;
 } catch (error: any) {
-    console.error('Error loading roles:', error);
-    showNotification(`خطا در بارگذاری نقش‌ها: ${error.message}`, 'error');
+    console.error('Error loading users:', error);
+    showNotification(`خطا در بارگذاری کاربران: ${error.message}`, 'error');
 } finally {
     isLoadingList.value = false;
 }
 };
 
-const handleEdit = async (role: Role) => {
+const handleEdit = async (user: User) => {
 try {
-    const data = await roleService.getRoleById(role.id!);
-    if (data && roleFormRef.value) {
-    roleFormRef.value.openForEdit(data);
+    const data = await userService.getUserById(user.id!);
+    if (data && userFormRef.value) {
+    userFormRef.value.openForEdit(data);
     }
 } catch (error: any) {
-    console.error('Error loading role details:', error);
-    showNotification(`خطا در بارگذاری اطلاعات نقش برای ویرایش: ${error.message}`, 'error');
+    console.error('Error loading user details:', error);
+    showNotification(`خطا در بارگذاری اطلاعات کاربر برای ویرایش: ${error.message}`, 'error');
 }
 };
 
-const handleDelete = async (role: Role) => {
-if (!role.id) return;
+const handleDelete = async (user: User) => {
+if (!user.id) return;
 
-if (confirm(`آیا از حذف نقش "${role.name}" اطمینان دارید؟`)) {
+if (confirm(`آیا از حذف کاربر "${user.username}" اطمینان دارید؟`)) {
     isLoading.value = true;
     try {
-    await roleService.deleteRole(role.id);
-    showNotification('نقش با موفقیت حذف شد', 'success');
-    await loadRoles();
+    await userService.deleteUser(user.id);
+    showNotification('کاربر با موفقیت حذف شد', 'success');
+    await loadUsers();
     } catch (error: any) {
-    console.error('Error deleting role:', error);
-    showNotification(`خطا در حذف نقش: ${error.message}`, 'error');
+    console.error('Error deleting user:', error);
+    showNotification(`خطا در حذف کاربر: ${error.message}`, 'error');
     } finally {
     isLoading.value = false;
     }
@@ -142,16 +142,16 @@ pageSize.value = size;
 };
 
 onMounted(() => {
-  loadRoles();
+loadUsers();
 });
 
 definePageMeta({
-  layout: 'default'
+layout: 'default'
 });
 </script>
 
 <style scoped>
 .container {
-  max-width: 1200px;
+max-width: 1200px;
 }
 </style>

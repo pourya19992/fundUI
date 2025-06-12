@@ -1,120 +1,99 @@
 <template>
   <div>
-    <button v-if="!isEditMode" @click="onOpen" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+    <button @click="openModalForAdd" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
       نقش جدید
     </button>
-    <Modal :is-open="isOpen" @close="onClose">
-      <template #body>
-        <div>
-          <h3 class="text-center text-lg font-semibold mb-4">{{ isEditMode ? 'ویرایش مجوز' : 'مجوز جدید' }}</h3>
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm">نام نقش</label>
-              <input
-                  v-model="form.name"
-                  type="text"
-                  class="input-field"
-              />
-            </div>
 
+    <BaseFormModal
+      v-model:modelValue="isModalOpen"
+      :title="isEditMode ? 'ویرایش نقش' : 'نقش جدید'"
+      submit-button-text="ثبت"
+      cancel-button-text="انصراف"
+      :is-loading="isSubmitting"
+      :is-submitting="isSubmitting"
+      @submit="handleSubmit"
+      @cancel="closeModal"
+    >
+      <template #form-fields>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm">نام نقش</label>
+            <input
+              v-model="form.name"
+              type="text"
+              class="input-field"
+            />
           </div>
         </div>
       </template>
-
-      <template #footer>
-        <div class="flex justify-center gap-4">
-          <button
-            @click="handleSubmit"
-            class="btn-primary w-24"
-            :disabled="isLoading"
-          >
-            ثبت
-          </button>
-          <button
-            @click="onClose"
-            class="btn-secondary w-24"
-          >
-            انصراف
-          </button>
-        </div>
-      </template>
-    </Modal>
+    </BaseFormModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, defineExpose, watch } from "vue";
-import Modal from "@/components/Modal.vue";
+import BaseFormModal from "@/components/base/BaseFormModal.vue";
 import { useNotify } from "@/helpers/hooks/useNotify";
 import { createRoleService } from '@/services/baseInformation/roleService';
 import { useRuntimeConfig } from "nuxt/app";
+import type { Role } from "@/services/baseInformation/roleService";
 
 const emit = defineEmits(['submit']);
 const notify = useNotify();
 const config = useRuntimeConfig();
 const roleService = createRoleService(config.public.apiBase);
 
-const isOpen = ref(false);
-const isLoading = ref(false);
+const isModalOpen = ref(false);
 const isEditMode = ref(false);
-
-const form = reactive({
-  id: null as number | null,
-  name: "",
-  url: "",
-  isSensitive: false,
+const form = ref<Role>({
+  name: ''
 });
+const isSubmitting = ref(false);
 
-const onOpen = () => {
+const openModalForAdd = () => {
   isEditMode.value = false;
-  isOpen.value = true;
-  resetForm();
+  isModalOpen.value = true;
+  form.value = { name: '' }; // Clear form for add
 };
 
-const openForEdit = (data: { id: number; name: string; url: string }) => {
+const openForEdit = (data: Role) => {
   isEditMode.value = true;
-  isOpen.value = true;
-  Object.assign(form, data);
+  isModalOpen.value = true;
+  form.value = { ...data };
 };
 
-const onClose = () => {
-  isOpen.value = false;
-  isEditMode.value = false;
-  resetForm();
-};
-
-const resetForm = () => {
-  form.id = null;
-  form.name = "";
-  form.url = "";
-  form.isSensitive = false;
+const closeModal = () => {
+  isModalOpen.value = false;
+  form.value = {
+    name: ''
+  };
+  isEditMode.value = false; // Reset edit mode on close
 };
 
 const handleSubmit = async () => {
-  if (!form.name) {
+  if (!form.value.name) {
     notify({ description: "تمام فیلدها باید پر شوند.", status: "warning" });
     return;
   }
-  isLoading.value = true;
+  isSubmitting.value = true;
   try {
-    if (form.id) {
-      await roleService.updateRole(form.id, form as any);
+    if (isEditMode.value) {
+      await roleService.updateRole(form.value.id!, form.value);
       notify({ description: "نقش با موفقیت ویرایش شد.", status: "success" });
     } else {
-      await roleService.addRole(form as any);
+      await roleService.addRole(form.value);
       notify({ description: "نقش با موفقیت اضافه شد.", status: "success" });
     }
-    emit('submit');
-    onClose();
+    emit('submit'); // Notify parent to refresh data
+    closeModal();
   } catch (error: any) {
     notify({ description: `خطا: ${error.message}`, status: "error" });
   } finally {
-    isLoading.value = false;
+    isSubmitting.value = false;
   }
 };
 
-
-defineExpose({ onOpen, openForEdit });
+defineExpose({ openForEdit, openModalForAdd });
 
 </script>
 

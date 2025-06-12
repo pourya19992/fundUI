@@ -1,4 +1,5 @@
 import { createBaseService } from '../baseService';
+import { ref } from 'vue';
 
 export interface Calendar {
 id: number;
@@ -63,12 +64,11 @@ return {
 
     async deleteCalendar(id: number): Promise<void> {
     try {
-        await apiClient.delete(`${API_URL}/${id}`);
+        await apiClient.delete(`${API_URL}/remove/${id}`);
     } catch (error) {
         console.error('Error deleting calendar:', error);
         throw handleError(error);
     }
     },
-
 };
 };

@@ -40,8 +40,12 @@
       </tbody>
     </table>
     <div class="mt-4">
-          <Pagination :current-page="currentPage" :total-pages="totalPages" :page-size="pageSize"
-              :on-page-change="onPageChange" :on-page-size-change="onPageSizeChange" />
+          <Pagination
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          :page-size="pageSize"
+          :on-page-change="onPageChange"
+          :on-page-size-change="onPageSizeChange" />
       </div>
   </div>
 </template>
