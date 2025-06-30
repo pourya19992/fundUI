@@ -1,7 +1,7 @@
 <template>
   <div class="overflow-x-auto">
     <div v-if="isLoading" class="text-center py-4">
-      <Icon name="mdi:loading" class="animate-spin h-8 w-8 mx-auto text-blue-600" />
+      <div class="animate-spin h-8 w-8 mx-auto text-blue-600 border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
       <p class="mt-2 text-gray-600">در حال بارگذاری...</p>
     </div>
 
@@ -20,6 +20,7 @@
             <slot name="data-cells" :item="item as TItem"></slot>
             <td class="px-6 py-4 whitespace-nowrap text-left">
               <div class="flex items-center gap-2">
+                <slot name="additional-actions" :item="item"></slot>
                 <EditIcon
                   @click="handleEditClick(item)"
                   :disabled="isOperationDisabled"
@@ -112,12 +113,10 @@ const onPageSizeChange = (size: number) => {
 };
 
 const handleEditClick = (item: TItem) => {
-  console.log('Emitting edit event for item:', item);
   emit('edit', item);
 };
 
 const handleDeleteClick = (item: TItem) => {
-  console.log('Emitting delete event for item:', item);
   emit('delete', item);
 };
 </script>

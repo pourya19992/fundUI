@@ -7,9 +7,24 @@ id?: number;
 name: string;
 }
 
+export interface UserRoleDto {
+    userId: number;
+    roleIds: number[];
+}
+
 interface ApiResponse {
     message: string;
     data?: any;
+}
+
+export interface RoleUserGroupDto {
+    userGroupId: number;
+    roleIds: number[];
+}
+
+export interface RolePermissionDto {
+    roleId: number;
+    permissionIds: number[];
 }
 
 interface RoleDto extends Partial<Role> {}
@@ -68,5 +83,22 @@ return {
         return handleError(error);
     }
     },
+
+    // Role assignments
+    async assignRoleToUserGroup(assignments: RoleUserGroupDto[]): Promise<void> {
+        try {
+        await apiClient.post('/api/v1/authentication/permission/assignRoleToUserGroup', assignments);
+        } catch (error) {
+        throw error;
+        }
+    },
+
+    async assignPermissionToRole(assignments: RolePermissionDto[]): Promise<void> {
+        try {
+        await apiClient.post('/api/v1/authentication/permission/assignPermissionToRole', assignments);
+        } catch (error) {
+        throw error;
+        }
+    }
 };
 };

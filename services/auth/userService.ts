@@ -207,6 +207,33 @@ export const createUserService = (baseURL: string) => {
       } catch (error) {
         throw error;
       }
+    },
+
+    async findUserRole (userId: number){
+      try {
+        const response = await apiClient.get(`${API_URL}/userRolePerUser/${userId}`);
+        return response.data;
+      } catch (error) {
+        return handleError(error);
+      }
+    },
+
+    async addUserRole(userId: number, roleId: number) {
+      try {
+        await this.assignRoleToUser([{ userId, roleIds: [roleId] }]);
+      } catch (error) {
+        return handleError(error);
+      }
+    },
+
+    async removeUserRole(userId: number, roleId: number) {
+      try {
+
+        const response = await apiClient.delete(`${API_URL}/removeRole/${userId}/${roleId}`);
+        return response.data;
+      } catch (error) {
+        return handleError(error);
+      }
     }
   };
 };

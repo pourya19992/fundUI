@@ -23,7 +23,6 @@ export const createBaseService = (baseURL: string) => {
   // Add request interceptor to include token
   apiClient.interceptors.request.use((config) => {
     const token = localStorage.getItem(ACCESS_TOKEN_NAME);
-    console.log("token:"+ token);
     if (token) {
       config.headers[HTTP_HEADERS.AUTHORIZATION] = `Bearer ${token}`;
     }

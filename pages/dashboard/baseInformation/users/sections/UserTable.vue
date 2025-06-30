@@ -28,11 +28,15 @@
         </span>
       </td>
     </template>
+    <template #additional-actions="{ item }">
+      <UserRole :user="item" />
+    </template>
   </BaseTable>
 </template>
 
 <script setup lang="ts">
 import BaseTable from '@/components/base/BaseTable.vue';
+import UserRole from './UserRole.vue';
 import { type User } from '@/services/auth/userService';
 
 const props = defineProps<{
@@ -68,4 +72,4 @@ const handlePageSizeChange = (size: number) => {
 };
 </script>
 
-<style scoped></style> 
+<style scoped></style>

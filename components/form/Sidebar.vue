@@ -13,6 +13,7 @@
         <NuxtLink to="/dashboard/administration/calendar" class="block py-3 px-4 rounded-lg hover:bg-gray-100">تقویم</NuxtLink>
         <NuxtLink to="/dashboard/baseInformation/permissions" class="block py-3 px-4 rounded-lg hover:bg-gray-100">مجوزها</NuxtLink>
         <NuxtLink to="/dashboard/baseInformation/role" class="block py-3 px-4 rounded-lg hover:bg-gray-100">نقش‌ها</NuxtLink>
+        <NuxtLink to="/dashboard/baseInformation/users" class="block py-3 px-4 rounded-lg hover:bg-gray-100">کاربران</NuxtLink>
       </nav>
     </div>
   </div>

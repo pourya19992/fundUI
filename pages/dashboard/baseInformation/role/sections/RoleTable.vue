@@ -58,4 +58,4 @@ const handlePageSizeChange = (size: number) => {
 };
 </script>
 
-<style scoped></style> 
+<style scoped></style>
