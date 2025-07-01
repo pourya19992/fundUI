@@ -38,9 +38,9 @@
       <div class="captcha-container">
         <div class="captcha-wrapper">
           <p class="captcha-text">{{ captcha }}</p>
-          <button 
-            type="button" 
-            @click="generateCaptcha" 
+          <button
+            type="button"
+            @click="generateCaptcha"
             class="refresh-captcha"
           >
             <span class="refresh-icon">🔄</span>
@@ -136,12 +136,12 @@ onMounted(async () => {
 });
 
 const generateCaptcha = () => {
-  // پاک کردن ورودی قبلی
+
   captchaInput.value = "";
-  // تولید کپچای جدید
+  // generate new captcha
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let result = '';
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 4; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   captcha.value = result;

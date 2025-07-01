@@ -216,24 +216,14 @@ export const createUserService = (baseURL: string) => {
       } catch (error) {
         return handleError(error);
       }
-    },
-
-    async addUserRole(userId: number, roleId: number) {
-      try {
-        await this.assignRoleToUser([{ userId, roleIds: [roleId] }]);
-      } catch (error) {
-        return handleError(error);
-      }
-    },
-
-    async removeUserRole(userId: number, roleId: number) {
-      try {
-
-        const response = await apiClient.delete(`${API_URL}/removeRole/${userId}/${roleId}`);
-        return response.data;
-      } catch (error) {
-        return handleError(error);
-      }
     }
   };
 };
+
+// Add a helper to map isActive to label for each user
+export function mapUsersWithLabels(users: User[]): (User & { isActiveLabel: string })[] {
+  return users.map((user: User) => ({
+    ...user,
+    isActiveLabel: user.isActive ? 'فعال' : 'غیرفعال',
+  }));
+}

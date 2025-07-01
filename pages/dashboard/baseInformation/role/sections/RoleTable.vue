@@ -1,27 +1,22 @@
 <template>
   <BaseTable
     :items="roles"
+    :columns="columns"
     :is-loading="isLoading"
     :is-operation-disabled="isDisabled"
     :current-page="currentPage"
     :total-pages="totalPages"
     :page-size="pageSize"
-    :colspan="2"
+    :colspan="1"
     @edit="handleEdit"
     @delete="handleDelete"
     @pageChange="handlePageChange"
     @pageSizeChange="handlePageSizeChange"
-  >
-    <template #header-cells>
-      <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">نام</th>
-    </template>
-    <template #data-cells="{ item }">
-      <td class="px-6 py-4 whitespace-nowrap">{{ item.name }}</td>
-    </template>
-  </BaseTable>
+  />
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import { type Role } from '@/services/baseInformation/roleService';
 
@@ -33,6 +28,10 @@ const props = defineProps<{
   totalPages: number;
   pageSize: number;
 }>();
+
+const columns = [
+  { label: 'نام', key: 'name' },
+];
 
 const emit = defineEmits<{
   (e: 'edit', item: Role): void;
