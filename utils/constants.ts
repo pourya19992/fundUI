@@ -10,7 +10,7 @@ export const APP_MAIN_PAGE = "/main";
 
 export const X_Tenant_Id = "X-TenantId";
 
-export const ds_code= 90001
+export const ds_code = 90001;
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -19,7 +19,7 @@ export const API_ENDPOINTS = {
     SEND_OTP: '/sendOtpForLogin',
     GET_OTP_STRATEGIES: '/getOtpStrategies'
   }
-} as const;
+};
 
 // HTTP Headers
 export const HTTP_HEADERS = {
@@ -27,7 +27,7 @@ export const HTTP_HEADERS = {
   AUTHORIZATION: 'Authorization',
   CONTENT_TYPE: 'Content-Type',
   ACCEPT: 'Accept'
-} as const;
+};
 
 // Default Values
 export const DEFAULT_TENANT_ID = '90001';

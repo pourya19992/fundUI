@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full bg-white rounded-lg shadow mr-6" dir="rtl">
+  <div class="w-full bg-white rounded-lg shadow mr-8" dir="rtl">
     <Notification
       :show="notification.show"
       :message="notification.message"
@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { createPermissionService } from '@/services/permissionService';
+import { createPermissionService } from '@/services/baseInformation/permissionService';
 import Notification from '@/components/form/Notification.vue';
 import PermissionTable from './sections/PermissionTable.vue';
 import PermissionForm from './sections/PermissionForm.vue';

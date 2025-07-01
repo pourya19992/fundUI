@@ -30,4 +30,4 @@ export const useAppStore = defineStore('app', {
       this.sidebarOpen = !this.sidebarOpen
     }
   }
-}) 
+})

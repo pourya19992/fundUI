@@ -1,5 +1,8 @@
-import axios from 'axios';
+import { a } from '@tanstack/vue-query/build/legacy/queryClient-C5JH3kKW';
+import { createBaseService } from '../baseService';
 import { log } from 'console';
+
+const API_URL = '/api/v1/authentication/user';
 
 export interface User {
   id: number;
@@ -85,49 +88,63 @@ export interface UserPermissionDto {
   permissionIds: number[];
 }
 
-export const createUserService = (baseURL: string) => {
-  const apiClient = axios.create({
-    baseURL,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-TenantId': '90001'
-    }
-  });
+interface ApiResponse {
+  message: string;
+  data?: any;
+}
 
-  apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    console.log(token);
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+export const createUserService = (baseURL: string) => {
+  const { apiClient, handleError } = createBaseService(baseURL);
 
   return {
-    // User operations
-    async addUser(user: UserDto): Promise<void> {
+    async getAllUsers() {
       try {
-        await apiClient.post('/api/v1/authentication/user/add', user);
+        const response = await apiClient.get(`${API_URL}`);
+        return response.data;
       } catch (error) {
-        throw error;
+        return handleError(error);
       }
     },
 
-    async updateUser(user: UserDto): Promise<void> {
+    async getUserById(id: number) {
       try {
-        await apiClient.put('/api/v1/authentication/user/edit', user);
+        const response = await apiClient.get(`${API_URL}/${id}`);
+        return response.data;
       } catch (error) {
-        throw error;
+        return handleError(error);
       }
     },
 
-    async deleteUser(userId: number): Promise<void> {
+    async addUser(user: UserDto): Promise<ApiResponse> {
       try {
-        await apiClient.delete('/api/v1/authentication/user/remove', {
-          params: { userId }
-        });
+        const response = await apiClient.post(`${API_URL}/add`, user);
+        return {
+          message: response.data.message || 'کاربر با موفقیت اضافه شد'
+        }
       } catch (error) {
-        throw error;
+        return handleError(error);
+      }
+    },
+
+    async updateUser(user: UserDto): Promise<ApiResponse> {
+      try {
+        const response = await apiClient.put(`${API_URL}/edit`, user);
+        return {
+          message: response.data.message || 'کاربر با موفقیت ویرایش شد'
+        }
+      } catch (error) {
+        return handleError(error);
+      }
+    },
+
+    async deleteUser(userId: number){
+      try {
+        const response = await apiClient.delete(`${API_URL}/remove/${userId}`);
+          return {
+            message: response.data.message || 'کاربر با موفقیت حذف شد'
+          };
+      } catch (error) {
+        return handleError(error);
       }
     },
 
@@ -190,6 +207,23 @@ export const createUserService = (baseURL: string) => {
       } catch (error) {
         throw error;
       }
+    },
+
+    async findUserRole (userId: number){
+      try {
+        const response = await apiClient.get(`${API_URL}/userRolePerUser/${userId}`);
+        return response.data;
+      } catch (error) {
+        return handleError(error);
+      }
     }
   };
-}; 
+};
+
+// Add a helper to map isActive to label for each user
+export function mapUsersWithLabels(users: User[]): (User & { isActiveLabel: string })[] {
+  return users.map((user: User) => ({
+    ...user,
+    isActiveLabel: user.isActive ? 'فعال' : 'غیرفعال',
+  }));
+}

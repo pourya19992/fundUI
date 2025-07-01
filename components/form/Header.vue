@@ -66,7 +66,7 @@
           <SheetIcon class="h-6 w-6 text-gray-600" />
         </button>
         <button @click.stop="() => router.push('/dashboard/administration/calendar')" class="btn-menu" aria-label="تقویم">
-          <SheetIcon class="h-6 w-6 text-gray-600" />
+          <CalendarIcon class="h-6 w-6 text-gray-600" />
         </button>
       </div>
     </transition>
@@ -140,6 +140,9 @@ import SheetIcon from '../../components/icons/SheetIcon.vue';
 import { createAuthService } from '../../services/auth/authService';
 import ReportIcon from '../icons/ReportIcon.vue';
 import ProfileIcon from '../icons/ProfileIcon.vue';
+import UserGroupIcon from '../icons/UserGroupIcon.vue';
+import CalendarIcon from '../icons/CalendarIcon.vue';
+
 
 
 const route = useRoute();

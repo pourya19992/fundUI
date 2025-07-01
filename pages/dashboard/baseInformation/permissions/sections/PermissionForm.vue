@@ -66,7 +66,7 @@
 import { ref, reactive, defineExpose, watch } from "vue";
 import Modal from "@/components/Modal.vue";
 import { useNotify } from "@/helpers/hooks/useNotify";
-import { createPermissionService } from '@/services/permissionService';
+import { createPermissionService } from '@/services/baseInformation/permissionService';
 import { useRuntimeConfig } from "nuxt/app";
 
 const emit = defineEmits(['submit']);
@@ -133,9 +133,6 @@ const handleSubmit = async () => {
   }
 };
 
-// Watch prop changes in case the parent passes new data for editing
-// This part might need adjustment based on how the parent will pass data
-// Leaving it out for now as the parent will call openForEdit directly.
 
 defineExpose({ onOpen, openForEdit });
 

@@ -27,7 +27,7 @@ export const createAuthService = () => {
   return {
     async getOtpStrategies(): Promise<Record<string, string>> {
       try {
-        const response = await apiClient.get('/getOtpStrategies');
+        const response = await apiClient.get('api/v1/getOtpStrategies');
         return response.data;
       } catch (error) {
         return handleError(error);
