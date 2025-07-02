@@ -71,7 +71,7 @@ import { createUserService } from '@/services/auth/userService';
 import { useNotify } from '@/helpers/hooks/useNotify';
 import type { User } from '@/services/auth/userService';
 import type { Role } from '@/services/baseInformation/roleService';
-import type { UserRole } from '@/types/userRole';
+import type { UserRole } from '@/services/auth/userService';
 
 const props = defineProps<{
 user: User;

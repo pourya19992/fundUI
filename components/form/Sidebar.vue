@@ -14,6 +14,7 @@
         <NuxtLink to="/dashboard/baseInformation/permissions" class="block py-3 px-4 rounded-lg hover:bg-gray-100">مجوزها</NuxtLink>
         <NuxtLink to="/dashboard/baseInformation/role" class="block py-3 px-4 rounded-lg hover:bg-gray-100">نقش‌ها</NuxtLink>
         <NuxtLink to="/dashboard/baseInformation/users" class="block py-3 px-4 rounded-lg hover:bg-gray-100">کاربران</NuxtLink>
+        <NuxtLink to="/dashboard/baseInformation/userGroup" class="block py-3 px-4 rounded-lg hover:bg-gray-100">گروه‌های کاربری</NuxtLink>
       </nav>
     </div>
   </div>

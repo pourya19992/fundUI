@@ -9,15 +9,15 @@
 
     <div class="p-6">
     <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">مدیریت نقش‌ها</h2>
-        <RoleForm
-        ref="roleFormRef"
-        @submit="loadRoles"
+        <h2 class="text-2xl font-bold">مدیریت گروه های کاربری</h2>
+        <UserGroupForm
+        ref="userGroupFormRef"
+        @submit="loadUserGroups"
         />
     </div>
 
-    <RoleTable
-        :roles="paginatedRoles"
+    <UserGroupTable
+        :user-groups="paginatedUserGroups"
         :is-loading="isLoadingList"
         :is-disabled="isLoading"
         :current-page="currentPage"
@@ -34,12 +34,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { createRoleService } from '@/services/baseInformation/roleService';
+import UserGroupForm from './sections/UserGroupForm.vue';
+import UserGroupTable from './sections/UserGroupTable.vue';
 import Notification from '@/components/form/Notification.vue';
-import RoleTable from './sections/RoleTable.vue';
-import RoleForm from './sections/RoleForm.vue';
 import { useRuntimeConfig } from "nuxt/app";
-import type { Role } from "@/services/baseInformation/roleService";
+import type { UserGroup } from "@/services/baseInformation/userGroupService";
+import { createUserGroupService } from "@/services/baseInformation/userGroupService";
 import { useNotify } from '@/helpers/hooks/useNotify';
 
 interface NotificationState {
@@ -50,9 +50,9 @@ type: 'success' | 'error';
 
 const notify = useNotify();
 const config = useRuntimeConfig();
-const roleService = createRoleService(config.public.apiBase);
+const userGroupService = createUserGroupService(config.public.apiBase);
 
-const roles = ref<Role[]>([]);
+const userGroups = ref<UserGroup[]>([]);
 const isLoading = ref(false);
 const isLoadingList = ref(false);
 const notification = ref<NotificationState>({
@@ -64,15 +64,15 @@ type: 'success'
 const currentPage = ref(0);
 const pageSize = ref(10);
 
-const totalPages = computed(() => Math.ceil(roles.value.length / pageSize.value));
+const totalPages = computed(() => Math.ceil(userGroups.value.length / pageSize.value));
 
-const paginatedRoles = computed(() => {
+const paginatedUserGroups = computed(() => {
   const start = currentPage.value * pageSize.value;
 const end = start + pageSize.value;
-return roles.value.slice(start, end);
+return userGroups.value.slice(start, end);
 });
 
-const roleFormRef = ref<InstanceType<typeof RoleForm> | null>(null);
+const userGroupFormRef = ref<InstanceType<typeof UserGroupForm> | null>(null);
 
 const showNotification = (message: string, type: 'success' | 'error') => {
 notification.value = {
@@ -89,43 +89,43 @@ const closeNotification = () => {
 notification.value.show = false;
 };
 
-const loadRoles = async () => {
+const loadUserGroups = async () => {
 isLoadingList.value = true;
 try {
-    const data = await roleService.getAllRoles();
-    roles.value = data;
+    const data = await userGroupService.getAllUserGroups();
+    userGroups.value = data;
 } catch (error: any) {
     console.error('Error loading roles:', error);
-    showNotification(`خطا در بارگذاری نقش‌ها: ${error.message}`, 'error');
+    showNotification(`خطا در بارگذاری گروه های کاربری: ${error.message}`, 'error');
 } finally {
     isLoadingList.value = false;
 }
 };
 
-const handleEdit = async (role: Role) => {
+const handleEdit = async (userGroup: UserGroup) => {
 try {
-    const data = await roleService.getRoleById(role.id!);
-    if (data && roleFormRef.value) {
-    roleFormRef.value.openForEdit(data);
+    const data = await userGroupService.getUserGroupById(userGroup.id!);
+    if (data && userGroupFormRef.value) {
+        userGroupFormRef.value.openForEdit(data);
     }
 } catch (error: any) {
-    console.error('Error loading role details:', error);
-    showNotification(`خطا در بارگذاری اطلاعات نقش برای ویرایش: ${error.message}`, 'error');
+    console.error('Error loading userGroup details:', error);
+    showNotification(`خطا در بارگذاری اطلاعات گروه های کاربری برای ویرایش: ${error.message}`, 'error');
 }
 };
 
-const handleDelete = async (role: Role) => {
-if (!role.id) return;
+const handleDelete = async (userGroup: UserGroup) => {
+if (!userGroup.id) return;
 
-if (confirm(`آیا از حذف نقش "${role.name}" اطمینان دارید؟`)) {
+if (confirm(`آیا از حذف 'گروه کاربری' "${userGroup.name}" اطمینان دارید؟`)) {
     isLoading.value = true;
     try {
-    await roleService.deleteRole(role.id);
-    showNotification('نقش با موفقیت حذف شد', 'success');
-    await loadRoles();
+    await userGroupService.deleteUserGroup(userGroup.id);
+    showNotification('گروه کاربری با موفقیت حذف شد', 'success');
+    await loadUserGroups();
     } catch (error: any) {
-    console.error('Error deleting role:', error);
-    showNotification(`خطا در حذف نقش: ${error.message}`, 'error');
+    console.error('Error deleting userGroup:', error);
+    showNotification(`خطا در حذف گروه کاربری: ${error.message}`, 'error');
     } finally {
     isLoading.value = false;
     }
@@ -142,16 +142,10 @@ pageSize.value = size;
 };
 
 onMounted(() => {
-loadRoles();
+loadUserGroups();
 });
 
 definePageMeta({
 layout: 'default'
 });
 </script>
-
-<style scoped>
-.container {
-max-width: 1200px;
-}
-</style>
