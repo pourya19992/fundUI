@@ -7,14 +7,31 @@ export interface UserGroup {
     name: string;
 }
 
+export interface UserGroupRole {
+    id: number;
+    userGroupId: number;
+    roleId: number;
+    role?: {
+    id: number;
+    name: string;
+    };
+    createdAt?: string;
+    updatedAt?: string;
+}
+
 interface ApiResponse {
     message: string;
     data?: any;
 }
 
 export interface UserGroupDto {
-    id?: number;
+    userGroupId?: number;
     name: string;
+}
+
+export interface UserGroupRoleDto {
+    userGroupId: number;
+    roleIds: number[];
 }
 
 export const createUserGroupService = (baseURL: string) => {
@@ -71,6 +88,14 @@ export const createUserGroupService = (baseURL: string) => {
                 }
             },
 
+            async findUserGroupRole (userGroupId: number){
+                try {
+                const response = await apiClient.get(`${API_URL}/userGroupRolePerUserGroup/${userGroupId}`);
+                return response.data;
+                } catch (error) {
+                return handleError(error);
+                }
+            }
 
     }
 }

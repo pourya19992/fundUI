@@ -27,7 +27,11 @@
         @delete="handleDelete"
         @pageChange="handlePageChange"
         @pageSizeChange="handlePageSizeChange"
-    />
+    >
+        <template #additional-actions="{ item }">
+            <UserGroupRole :userGroup="item" />
+        </template>
+    </UserGroupTable>
     </div>
 </div>
 </template>
@@ -41,6 +45,7 @@ import { useRuntimeConfig } from "nuxt/app";
 import type { UserGroup } from "@/services/baseInformation/userGroupService";
 import { createUserGroupService } from "@/services/baseInformation/userGroupService";
 import { useNotify } from '@/helpers/hooks/useNotify';
+import UserGroupRole from './sections/UserGroupRole.vue';
 
 interface NotificationState {
 show: boolean;
@@ -50,7 +55,7 @@ type: 'success' | 'error';
 
 const notify = useNotify();
 const config = useRuntimeConfig();
-const userGroupService = createUserGroupService(config.public.apiBase);
+const userGroupService = createUserGroupService(BASE_URL);
 
 const userGroups = ref<UserGroup[]>([]);
 const isLoading = ref(false);

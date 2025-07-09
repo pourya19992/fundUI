@@ -1,14 +1,14 @@
 <template>
 <div>
     <BaseTooltip label="نقش ها">
-    <div class="cursor-pointer" @click="openModal">
-        <ProfileIcon />
-    </div>
+        <div class="cursor-pointer" @click="openModal">
+            <ProfileIcon />
+        </div>
     </BaseTooltip>
 
     <BaseFormModal
     v-model:modelValue="isModalOpen"
-    :title="'نقش های کاربر'"
+    :title="'نقش های گروه کاربری'"
     submit-button-text="ثبت"
     cancel-button-text="انصراف"
     :is-loading="isLoading"
@@ -56,19 +56,21 @@ import BaseFormModal from '@/components/base/BaseFormModal.vue';
 import BaseLoading from '@/components/base/BaseLoading.vue';
 import ProfileIcon from '@/components/icons/ProfileIcon.vue';
 import { useRoleStore } from '@/stores/roleStore';
-import { createUserService } from '@/services/auth/userService';
 import { useNotify } from '@/helpers/hooks/useNotify';
-import type { User } from '@/services/auth/userService';
+import type { UserGroup } from "@/services/baseInformation/userGroupService";
 import type { Role } from '@/services/baseInformation/roleService';
-import type { UserRole } from '@/services/auth/userService';
+import { createUserGroupService } from "@/services/baseInformation/userGroupService";
+import type { UserGroupRole } from "@/services/baseInformation/userGroupService";
+import { createRoleService } from "@/services/baseInformation/roleService"
 
 const props = defineProps<{
-user: User;
+userGroup: UserGroup;
 }>();
 
 
 const config = useRuntimeConfig();
-const userService = createUserService(config.public.apiBase);
+const userService = createUserGroupService(config.public.apiBase);
+const roleService = createRoleService(config.public.apiBase);
 
 const roleStore = useRoleStore();
 const notify = useNotify();
@@ -77,7 +79,7 @@ const isModalOpen = ref(false);
 const isLoading = ref(false);
 const isUpdating = ref(false);
 const roles = ref<Role[]>([]);
-const userRoles = ref<UserRole[]>([]);
+const userGroupRoles = ref<UserGroupRole[]>([]);
 const selectedRoleIds = ref<number[]>([]);
 
 const loadData = async () => {
@@ -87,25 +89,30 @@ const loadData = async () => {
         const rolesData = await roleStore.fetchRoles();
         roles.value = rolesData;
 
+        // Guard: Ensure userGroup.id exists
+        if (!props.userGroup.id) {
+            isLoading.value = false;
+            return;
+        }
         // Load user roles second
-        const userRolesData = await userService.findUserRole(props.user.id);
+        const userGroupRolesData = await userService.findUserGroupRole(props.userGroup.id);
 
         // Handle the response format: {userId: number, roleIds: number[]}
-        if (userRolesData && userRolesData.roleIds) {
+        if (userGroupRolesData && userGroupRolesData.roleIds) {
             // Convert to UserRole format for consistency
-            userRoles.value = userRolesData.roleIds.map((roleId: number) => ({
+            userGroupRoles.value = userGroupRolesData.roleIds.map((roleId: number) => ({
                 id: roleId, // Use roleId as temporary id
-                userId: props.user.id,
+                userId: props.userGroup.id,
                 roleId: roleId
             }));
-            selectedRoleIds.value = [...userRolesData.roleIds];
+            selectedRoleIds.value = [...userGroupRolesData.roleIds];
         } else {
-            userRoles.value = [];
+            userGroupRoles.value = [];
             selectedRoleIds.value = [];
         }
     } catch (error) {
         notify({
-            description: 'خطا در بارگذاری نقش ها',
+            description: 'خطا در بارگذاری گروه کاربری',
             status: 'error'
         });
     } finally {
@@ -116,10 +123,17 @@ const loadData = async () => {
 const assignRoles = async () => {
     isUpdating.value = true;
     try {
-        await userService.assignRoleToUser([{
-            userId: props.user.id,
-            roleIds: selectedRoleIds.value
-        }]);
+        // Guard: Ensure userGroup.id exists
+        if (!props.userGroup.id) {
+            isUpdating.value = false;
+            return;
+        }
+        await roleService.assignRoleToUserGroup([
+            {
+                userGroupId: props.userGroup.id,
+                roleIds: selectedRoleIds.value
+            }
+        ]);
 
         notify({
             description: 'نقش ها با موفقیت بروزرسانی شد',

@@ -27,7 +27,11 @@
         @delete="handleDelete"
         @pageChange="handlePageChange"
         @pageSizeChange="handlePageSizeChange"
-    />
+    >
+        <template #additional-actions="{ item}">
+            <RolePermissions :role="item" />
+        </template>
+</RoleTable>
     </div>
 </div>
 </template>
@@ -41,6 +45,7 @@ import RoleForm from './sections/RoleForm.vue';
 import { useRuntimeConfig } from "nuxt/app";
 import type { Role } from "@/services/baseInformation/roleService";
 import { useNotify } from '@/helpers/hooks/useNotify';
+import RolePermissions from './sections/RolePermissions.vue';
 
 interface NotificationState {
 show: boolean;
@@ -49,8 +54,7 @@ type: 'success' | 'error';
 }
 
 const notify = useNotify();
-const config = useRuntimeConfig();
-const roleService = createRoleService(config.public.apiBase);
+const roleService = createRoleService(BASE_URL);
 
 const roles = ref<Role[]>([]);
 const isLoading = ref(false);

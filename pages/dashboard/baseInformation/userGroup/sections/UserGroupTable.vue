@@ -12,7 +12,11 @@
     @delete="handleDelete"
     @pageChange="handlePageChange"
     @pageSizeChange="handlePageSizeChange"
-    />
+    >
+    <template #additional-actions="slotProps">
+    <slot name="additional-actions" v-bind="slotProps" />
+    </template>
+</BaseTable>
 </template>
 
 <script setup lang="ts">

@@ -49,8 +49,7 @@ type: 'success' | 'error';
 }
 
 const notify = useNotify();
-const config = useRuntimeConfig();
-const userService = createUserService(config.public.apiBase);
+const userService = createUserService(BASE_URL);
 
 const users = ref<User[]>([]);
 const isLoading = ref(false);
