@@ -74,8 +74,8 @@
     const props = defineProps<{ role: Role }>();
 
     const config = useRuntimeConfig();
-    const permissionService = createPermissionService(config.public.apiBase);
-    const roleService = createRoleService(config.public.apiBase);
+    const permissionService = createPermissionService(BASE_URL);
+    const roleService = createRoleService(BASE_URL);
 
     const notify = useNotify();
 

@@ -40,7 +40,7 @@ import { createUserGroupService } from "@/services/baseInformation/userGroupServ
 const emit = defineEmits(['submit']);
 const notify = useNotify();
 const config = useRuntimeConfig();
-const userGroupService = createUserGroupService(config.public.apiBase);
+const userGroupService = createUserGroupService(BASE_URL);
 
 const isModalOpen = ref(false);
 const isEditMode = ref(false);

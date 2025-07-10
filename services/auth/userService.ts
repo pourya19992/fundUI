@@ -47,6 +47,18 @@ export interface UserRole {
   updatedAt?: string;
 }
 
+export interface UserGroupDetail {
+  id: number;
+  userId: number;
+  userGroupId: number;
+  userGroup?: {
+    id: number;
+    name: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface UserDto {
   id?: number;
   isActive: boolean;
@@ -79,11 +91,21 @@ export interface UserDto {
   password: string;
 }
 
-
+export interface UserPermission {
+  id: number;
+  userId: number;
+  permissionId: number;
+  permission?: {
+    id: number;
+    name: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface UserGroupDetailDto {
-  userGroupId: number;
-  userIds: number[];
+  userId: number;
+  userGroupIds: number[];
 }
 
 export interface UserRoleDto {
@@ -197,7 +219,25 @@ export const createUserService = (baseURL: string) => {
       } catch (error) {
         return handleError(error);
       }
-    }
+    },
+
+    async getUserPermissions(userId: number) {
+      try {
+          const response = await apiClient.get(`${API_URL}/userPermissionPerUserId/${userId}`);
+          return response.data;
+      } catch (error) {
+          return handleError(error);
+      }
+  },
+
+  async getUserGroupDetails(userId: number) {
+      try{
+        const response = await apiClient.get(`${API_URL}/userGroupPerUserId/${userId}`);
+        return response.data;
+      } catch (error) {
+        return handleError(error);
+      }
+  },
   };
 };
 

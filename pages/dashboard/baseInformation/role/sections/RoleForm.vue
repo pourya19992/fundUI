@@ -41,7 +41,7 @@ import type { Role } from "@/services/baseInformation/roleService";
 const emit = defineEmits(['submit']);
 const notify = useNotify();
 const config = useRuntimeConfig();
-const roleService = createRoleService(config.public.apiBase);
+const roleService = createRoleService(BASE_URL);
 
 const isModalOpen = ref(false);
 const isEditMode = ref(false);

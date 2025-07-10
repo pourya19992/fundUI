@@ -68,7 +68,7 @@ user: User;
 
 
 const config = useRuntimeConfig();
-const userService = createUserService(config.public.apiBase);
+const userService = createUserService(BASE_URL);
 
 const roleStore = useRoleStore();
 const notify = useNotify();

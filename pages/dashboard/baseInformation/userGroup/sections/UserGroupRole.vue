@@ -69,8 +69,8 @@ userGroup: UserGroup;
 
 
 const config = useRuntimeConfig();
-const userService = createUserGroupService(config.public.apiBase);
-const roleService = createRoleService(config.public.apiBase);
+const userService = createUserGroupService(BASE_URL);
+const roleService = createRoleService(BASE_URL);
 
 const roleStore = useRoleStore();
 const notify = useNotify();

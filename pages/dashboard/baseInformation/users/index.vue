@@ -38,7 +38,6 @@ import { createUserService } from '@/services/auth/userService';
 import Notification from '@/components/form/Notification.vue';
 import UserTable from './sections/UserTable.vue';
 import UserForm from './sections/UserForm.vue';
-import { useRuntimeConfig } from "nuxt/app";
 import type { User } from "@/services/auth/userService";
 import { useNotify } from '@/helpers/hooks/useNotify';
 
@@ -48,7 +47,6 @@ message: string;
 type: 'success' | 'error';
 }
 
-const notify = useNotify();
 const userService = createUserService(BASE_URL);
 
 const users = ref<User[]>([]);

@@ -84,7 +84,6 @@ return {
     }
     },
 
-    // Role assignments
     async assignRoleToUserGroup(assignments: RoleUserGroupDto[]): Promise<void> {
         try {
         await apiClient.post('/api/v1/authentication/permission/assignRoleToUserGroup', assignments);

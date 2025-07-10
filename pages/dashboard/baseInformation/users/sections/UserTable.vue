@@ -15,6 +15,8 @@
   >
     <template #additional-actions="{ item }">
       <UserRole :user="item" />
+      <UserPermissions :user="item" />
+      <UserGroupDetail :user="item" />
     </template>
   </BaseTable>
 </template>
@@ -24,6 +26,8 @@ import { ref, computed } from 'vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import UserRole from './UserRole.vue';
 import { type User, mapUsersWithLabels } from '@/services/auth/userService';
+import UserPermissions from './UserPermissions.vue';
+import UserGroupDetail from './UserGroupDetail.vue';
 
 const props = defineProps<{
   users: User[];

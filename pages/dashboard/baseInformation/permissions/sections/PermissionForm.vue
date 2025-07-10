@@ -72,7 +72,7 @@ import { useRuntimeConfig } from "nuxt/app";
 const emit = defineEmits(['submit']);
 const notify = useNotify();
 const config = useRuntimeConfig();
-const permissionService = createPermissionService(config.public.apiBase);
+const permissionService = createPermissionService(BASE_URL);
 
 const isOpen = ref(false);
 const isLoading = ref(false);
