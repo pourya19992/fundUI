@@ -1,5 +1,5 @@
 <template>
-  <BaseTable
+<BaseTable
     :items="roles"
     :columns="columns"
     :is-loading="isLoading"
@@ -12,13 +12,18 @@
     @delete="handleDelete"
     @pageChange="handlePageChange"
     @pageSizeChange="handlePageSizeChange"
-  />
+  >
+  <template #additional-actions="slotProps">
+  <slot name="additional-actions" v-bind="slotProps" />
+  </template>
+</BaseTable>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import BaseTable from '@/components/base/BaseTable.vue';
 import { type Role } from '@/services/baseInformation/roleService';
+
 
 const props = defineProps<{
   roles: Role[];

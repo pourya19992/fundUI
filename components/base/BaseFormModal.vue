@@ -1,7 +1,7 @@
 <template>
-  <Modal :is-open="isOpen" @close="onClose">
+  <Modal :is-open="isOpen" @close="onClose" :size="size">
     <template #body>
-      <div>
+      <div class="max-h-[70vh] overflow-y-auto p-1">
         <h3 class="text-center text-lg font-semibold mb-4">{{ title }}</h3>
         <!-- Slot for form fields -->
         <slot name="form-fields"></slot>
@@ -57,6 +57,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+
+  size: {
+    type: String,
+    default: "lg"
+  }
 });
 
 const emit = defineEmits(['update:modelValue', 'submit', 'cancel']);

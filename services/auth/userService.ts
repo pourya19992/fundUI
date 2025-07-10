@@ -1,6 +1,5 @@
-import { a } from '@tanstack/vue-query/build/legacy/queryClient-C5JH3kKW';
 import { createBaseService } from '../baseService';
-import { log } from 'console';
+
 
 const API_URL = '/api/v1/authentication/user';
 
@@ -36,6 +35,30 @@ export interface User {
   password: string;
 }
 
+export interface UserRole {
+  id: number;
+  userId: number;
+  roleId: number;
+  role?: {
+    id: number;
+    name: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface UserGroupDetail {
+  id: number;
+  userId: number;
+  userGroupId: number;
+  userGroup?: {
+    id: number;
+    name: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface UserDto {
   id?: number;
   isActive: boolean;
@@ -68,14 +91,21 @@ export interface UserDto {
   password: string;
 }
 
-export interface UserGroupDto {
-  id?: number;
-  name: string;
+export interface UserPermission {
+  id: number;
+  userId: number;
+  permissionId: number;
+  permission?: {
+    id: number;
+    name: string;
+  };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UserGroupDetailDto {
-  userGroupId: number;
-  userIds: number[];
+  userId: number;
+  userGroupIds: number[];
 }
 
 export interface UserRoleDto {
@@ -148,33 +178,6 @@ export const createUserService = (baseURL: string) => {
       }
     },
 
-    // User group operations
-    async addUserGroup(group: UserGroupDto): Promise<void> {
-      try {
-        await apiClient.post('/api/v1/authentication/userGroup/add', group);
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async updateUserGroup(group: UserGroupDto): Promise<void> {
-      try {
-        await apiClient.put('/api/v1/authentication/userGroup/edit', group);
-      } catch (error) {
-        throw error;
-      }
-    },
-
-    async deleteUserGroup(userGroupId: number): Promise<void> {
-      try {
-        await apiClient.delete('/api/v1/authentication/userGroup/remove', {
-          params: { userGroupId }
-        });
-      } catch (error) {
-        throw error;
-      }
-    },
-
     // User assignments
     async assignUserToGroup(assignments: UserGroupDetailDto[]): Promise<void> {
       try {
@@ -216,7 +219,25 @@ export const createUserService = (baseURL: string) => {
       } catch (error) {
         return handleError(error);
       }
-    }
+    },
+
+    async getUserPermissions(userId: number) {
+      try {
+          const response = await apiClient.get(`${API_URL}/userPermissionPerUserId/${userId}`);
+          return response.data;
+      } catch (error) {
+          return handleError(error);
+      }
+  },
+
+  async getUserGroupDetails(userId: number) {
+      try{
+        const response = await apiClient.get(`${API_URL}/userGroupPerUserId/${userId}`);
+        return response.data;
+      } catch (error) {
+        return handleError(error);
+      }
+  },
   };
 };
 

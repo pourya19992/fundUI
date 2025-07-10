@@ -81,7 +81,7 @@ const props = defineProps({
 });
 
 const config = useRuntimeConfig();
-const branchService = createBranchService(config.public.apiBase);
+const branchService = createBranchService(BASE_URL);
 
 const isOpen = ref(false);
 const isLoading = ref(false);

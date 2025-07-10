@@ -22,7 +22,7 @@ export interface RoleUserGroupDto {
     roleIds: number[];
 }
 
-export interface RolePermissionDto {
+export interface RolePermission {
     roleId: number;
     permissionIds: number[];
 }
@@ -84,7 +84,6 @@ return {
     }
     },
 
-    // Role assignments
     async assignRoleToUserGroup(assignments: RoleUserGroupDto[]): Promise<void> {
         try {
         await apiClient.post('/api/v1/authentication/permission/assignRoleToUserGroup', assignments);
@@ -93,12 +92,22 @@ return {
         }
     },
 
-    async assignPermissionToRole(assignments: RolePermissionDto[]): Promise<void> {
+    async assignPermissionToRole(assignments: RolePermission[]): Promise<void> {
         try {
         await apiClient.post('/api/v1/authentication/permission/assignPermissionToRole', assignments);
         } catch (error) {
         throw error;
         }
-    }
+    },
+
+    async getRolePermissions(roleId: number) {
+        try {
+            const response = await apiClient.get(`${API_URL}/rolePermissionPerRoleId/${roleId}`);
+            return response.data;
+        } catch (error) {
+            return handleError(error);
+        }
+    },
+
 };
 };

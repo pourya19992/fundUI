@@ -3,7 +3,7 @@ import type { Role } from '@/services/baseInformation/roleService';
 import { createRoleService } from '@/services/baseInformation/roleService';
 
 const config = useRuntimeConfig();
-const roleService = createRoleService(config.public.apiBase);
+const roleService = createRoleService(BASE_URL);
 
 
 export const useRoleStore = defineStore('role', {

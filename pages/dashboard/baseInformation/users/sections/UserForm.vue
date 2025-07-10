@@ -104,7 +104,7 @@ import type { User, UserDto } from "@/services/auth/userService";
 const emit = defineEmits(['submit']);
 const notify = useNotify();
 const config = useRuntimeConfig();
-const userService = createUserService(config.public.apiBase);
+const userService = createUserService(BASE_URL);
 
 interface FormState extends Omit<UserDto, 'person'> {
   person: {
