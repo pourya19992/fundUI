@@ -41,10 +41,8 @@ import { ref, onMounted, computed } from 'vue';
 import UserGroupForm from './sections/UserGroupForm.vue';
 import UserGroupTable from './sections/UserGroupTable.vue';
 import Notification from '@/components/form/Notification.vue';
-import { useRuntimeConfig } from "nuxt/app";
 import type { UserGroup } from "@/services/baseInformation/userGroupService";
 import { createUserGroupService } from "@/services/baseInformation/userGroupService";
-import { useNotify } from '@/helpers/hooks/useNotify';
 import UserGroupRole from './sections/UserGroupRole.vue';
 
 interface NotificationState {
@@ -53,8 +51,6 @@ message: string;
 type: 'success' | 'error';
 }
 
-const notify = useNotify();
-const config = useRuntimeConfig();
 const userGroupService = createUserGroupService(BASE_URL);
 
 const userGroups = ref<UserGroup[]>([]);

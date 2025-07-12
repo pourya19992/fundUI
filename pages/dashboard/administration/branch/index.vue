@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { createBranchService } from '../../../../services/administration/branchService';
+import type { Branch } from '../../../../services/administration/branchService';
 import Notification from '@/components/Notification.vue';
 import BranchForm from './sections/BranchForm.vue';
 import BranchTable from './sections/BranchTable.vue';
@@ -38,19 +39,6 @@ import { useRouter } from 'vue-router';
 import { useAppStore } from '../../../../stores/app';
 import { BASE_URL } from '@/utils/constants';
 import { useNotify, setNotificationComponent } from '@/helpers/hooks/useNotify';
-
-interface Branch {
-  id: number;
-  isActive: boolean;
-  code: string;
-  name: string;
-  manager: string;
-  phone: string;
-  fax: string;
-  cellPhone: string;
-  postalCode: string;
-  address: string;
-}
 
 const router = useRouter();
 const appStore = useAppStore();

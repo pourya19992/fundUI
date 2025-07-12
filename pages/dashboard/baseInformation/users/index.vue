@@ -39,7 +39,6 @@ import Notification from '@/components/form/Notification.vue';
 import UserTable from './sections/UserTable.vue';
 import UserForm from './sections/UserForm.vue';
 import type { User } from "@/services/auth/userService";
-import { useNotify } from '@/helpers/hooks/useNotify';
 
 interface NotificationState {
 show: boolean;

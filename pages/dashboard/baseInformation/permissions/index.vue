@@ -34,18 +34,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { createPermissionService } from '@/services/baseInformation/permissionService';
+import { createPermissionService, type Permission } from '@/services/baseInformation/permissionService';
 import Notification from '@/components/form/Notification.vue';
 import PermissionTable from './sections/PermissionTable.vue';
 import PermissionForm from './sections/PermissionForm.vue';
 import { BASE_URL } from '@/utils/constants';
-
-interface Permission {
-  id?: number;
-  name: string;
-  url: string;
-  isSensitive: boolean;
-}
 
 interface NotificationState {
   show: boolean;

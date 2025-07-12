@@ -67,11 +67,9 @@ import { ref, reactive, defineExpose, watch } from "vue";
 import Modal from "@/components/Modal.vue";
 import { useNotify } from "@/helpers/hooks/useNotify";
 import { createPermissionService } from '@/services/baseInformation/permissionService';
-import { useRuntimeConfig } from "nuxt/app";
 
 const emit = defineEmits(['submit']);
 const notify = useNotify();
-const config = useRuntimeConfig();
 const permissionService = createPermissionService(BASE_URL);
 
 const isOpen = ref(false);

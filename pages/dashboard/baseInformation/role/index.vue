@@ -42,7 +42,6 @@ import { createRoleService } from '@/services/baseInformation/roleService';
 import Notification from '@/components/form/Notification.vue';
 import RoleTable from './sections/RoleTable.vue';
 import RoleForm from './sections/RoleForm.vue';
-import { useRuntimeConfig } from "nuxt/app";
 import type { Role } from "@/services/baseInformation/roleService";
 import { useNotify } from '@/helpers/hooks/useNotify';
 import RolePermissions from './sections/RolePermissions.vue';
@@ -53,7 +52,6 @@ message: string;
 type: 'success' | 'error';
 }
 
-const notify = useNotify();
 const roleService = createRoleService(BASE_URL);
 
 const roles = ref<Role[]>([]);

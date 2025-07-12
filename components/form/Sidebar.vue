@@ -6,27 +6,74 @@
         @mouseleave="appStore.sidebarOpen = false"
     >
       <nav class="p-5 text-right">
-        <NuxtLink to="/dashboard" class="block py-3 px-4 rounded-lg hover:bg-gray-100">داشبورد</NuxtLink>
-        <NuxtLink to="/dashboard/profile" class="block py-3 px-4 rounded-lg hover:bg-gray-100">پروفایل</NuxtLink>
-        <NuxtLink to="/dashboard/settings" class="block py-3 px-4 rounded-lg hover:bg-gray-100">تنظیمات</NuxtLink>
-        <NuxtLink to="/dashboard/administration/branch" class="block py-3 px-4 rounded-lg hover:bg-gray-100">شعب</NuxtLink>
-        <NuxtLink to="/dashboard/administration/calendar" class="block py-3 px-4 rounded-lg hover:bg-gray-100">تقویم</NuxtLink>
-        <NuxtLink to="/dashboard/baseInformation/permissions" class="block py-3 px-4 rounded-lg hover:bg-gray-100">مجوزها</NuxtLink>
-        <NuxtLink to="/dashboard/baseInformation/role" class="block py-3 px-4 rounded-lg hover:bg-gray-100">نقش‌ها</NuxtLink>
-        <NuxtLink to="/dashboard/baseInformation/users" class="block py-3 px-4 rounded-lg hover:bg-gray-100">کاربران</NuxtLink>
-        <NuxtLink to="/dashboard/baseInformation/userGroup" class="block py-3 px-4 rounded-lg hover:bg-gray-100">گروه‌های کاربری</NuxtLink>
+        <div v-for="group in sidebarGroups" :key="group.key" class="mb-2">
+          <div
+            class="flex items-center justify-between py-2 px-4 cursor-pointer rounded-lg hover:bg-gray-100"
+            @click="toggleGroup(group.key)"
+          >
+            <span>{{ group.title }}</span>
+            <span>{{ openGroups[group.key] ? '▲' : '▼' }}</span>
+          </div>
+          <div v-show="openGroups[group.key]" class="pl-4">
+            <NuxtLink
+              v-for="item in group.items"
+              :key="item.to"
+              :to="item.to"
+              class="block py-2 px-4 rounded-lg hover:bg-gray-100"
+            >
+              {{ item.label }}
+            </NuxtLink>
+          </div>
+        </div>
       </nav>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useAppStore } from '~/stores/app';
 
 const route = useRoute();
 const appStore = useAppStore();
+
+const sidebarGroups = [
+  {
+    title: 'مدیریت',
+    key: 'administration',
+    items: [
+      { label: 'شعب', to: '/dashboard/administration/branch' },
+      { label: 'تقویم', to: '/dashboard/administration/calendar' },
+      { label: 'صندوق', to: '/dashboard/administration/fund' },
+    ],
+  },
+  {
+    title: 'اطلاعات پایه',
+    key: 'baseInformation',
+    items: [
+      { label: 'مجوزها', to: '/dashboard/baseInformation/permissions' },
+      { label: 'نقش‌ها', to: '/dashboard/baseInformation/role' },
+      { label: 'کاربران', to: '/dashboard/baseInformation/users' },
+      { label: 'گروه‌های کاربری', to: '/dashboard/baseInformation/userGroup' },
+    ],
+  },
+  {
+    title: 'عمومی',
+    key: 'general',
+    items: [
+      { label: 'داشبورد', to: '/dashboard' },
+      { label: 'پروفایل', to: '/dashboard/profile' },
+      { label: 'تنظیمات', to: '/dashboard/settings' },
+    ],
+  },
+];
+
+const openGroups = ref({});
+
+const toggleGroup = (key) => {
+  openGroups.value[key] = !openGroups.value[key];
+};
 
 const isSpecialPage = computed(() => {
   const specialPages = ['/', '/auth/login'];

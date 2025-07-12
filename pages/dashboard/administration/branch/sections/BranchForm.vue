@@ -71,7 +71,6 @@ import { ref, reactive } from "vue";
 import { createBranchService } from "~/services/administration/branchService";
 import Modal from "~/components/Modal.vue";
 import { useNotify } from "~/helpers/hooks/useNotify";
-import { useRuntimeConfig } from '#app';
 
 const props = defineProps({
   refetch: {
@@ -80,7 +79,6 @@ const props = defineProps({
   }
 });
 
-const config = useRuntimeConfig();
 const branchService = createBranchService(BASE_URL);
 
 const isOpen = ref(false);
