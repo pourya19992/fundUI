@@ -56,6 +56,7 @@ const sidebarGroups = [
       { label: 'نقش‌ها', to: '/dashboard/baseInformation/role' },
       { label: 'کاربران', to: '/dashboard/baseInformation/users' },
       { label: 'گروه‌های کاربری', to: '/dashboard/baseInformation/userGroup' },
+      { label: 'سرمایه گذاران', to: '/dashboard/baseInformation/customers'},
     ],
   },
   {
