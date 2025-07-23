@@ -1,4 +1,5 @@
 import { createBaseService } from '../baseService';
+import type { PagedResponse } from '../baseService';
 
 const API_URL = '/api/v1/baseInformation/customer';
 
@@ -58,7 +59,13 @@ export interface Customer {
 
 export interface CustomerBankAccount {
   id: number;
-  customer: string;
+  customerId: string;
+  bankAccounts?: BankAccount
+}
+
+export interface CustomerBankAccountRequest {
+  id?: number;
+  customerId: string;
   bankAccount?: BankAccount
 }
 
@@ -150,20 +157,6 @@ interface ApiResponse {
   data?: any;
 }
 
-export interface PagedResponse<T> {
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  content: T[];
-  number: number;
-  sort: any;
-  numberOfElements: number;
-  first: boolean;
-  last: boolean;
-  pageable: any;
-  empty: boolean;
-}
-
 export const createCustomerService = (baseURL: string) => {
   const { apiClient, handleError } = createBaseService(baseURL);
 
@@ -242,7 +235,7 @@ export const createCustomerService = (baseURL: string) => {
     },
 
     // Add customer bank account
-    async addCustomerBankAccount(bankAccount: CustomerBankAccountDto): Promise<ApiResponse> {
+    async addCustomerBankAccount(bankAccount: CustomerBankAccountRequest): Promise<ApiResponse> {
       try {
         const response = await apiClient.post(`${API_URL}/bankAccount/add`, bankAccount);
         return {
@@ -280,6 +273,15 @@ export const createCustomerService = (baseURL: string) => {
         await apiClient.put(`${API_URL}/${customerId}/bankAccount/default/${accountId}`);
       } catch (error) {
         throw error;
+      }
+    },
+
+    async getCustomerBankAccounts (customerId: number) {
+      try {
+        const response = await apiClient.get(`${API_URL}/bankAccount/${customerId}`);
+        return response.data;
+      } catch (error) {
+        throw  handleError(error);
       }
     }
   };

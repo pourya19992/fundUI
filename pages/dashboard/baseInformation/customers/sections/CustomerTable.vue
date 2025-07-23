@@ -12,13 +12,17 @@
     @delete="handleDelete"
     @pageChange="handlePageChange"
     @pageSizeChange="handlePageSizeChange"
-  />
+  >
+    <template #additional-actions="slotProps">
+      <slot name="additional-actions" v-bind="slotProps" />
+    </template>
+  </BaseTable>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
 import BaseTable from '@/components/base/BaseTable.vue';
-import type { Customer, CustomerRequestDto, CustomerResponseDto } from '@/services/baseInformation/customerService';
+import type { CustomerResponseDto } from '@/services/baseInformation/customerService';
 
 
 const props = defineProps<{
@@ -32,19 +36,20 @@ const props = defineProps<{
 
 const columns = [
   { label: 'نام', key: 'person.firstName' },
-  { label: 'نام خانوادگی', key: 'person.lastName' },
+  { label: 'نام خانوادگی/شرکت', key: 'lastNameDisplay' },
   { label: 'کد ملی', key: 'person.nationalCode' },
   { label: 'موبایل', key: 'person.cellPhone' },
-  { label: 'وضعیت', key: 'customerStatus.name' },
-  { label: 'دفتر کل تفصیلی', key: 'detailLedger.name' },
-  { label: 'حساب بانکی', key: 'customerBankAccount.bankAccount.accountNumber' },
-  { label: 'سود پرداختی', key: 'profitIssueLabel' },
+  { label: 'وضعیت', key: 'customerStatusName' },
+  { label: 'کد تفصیلی', key: 'dlNumber' },
+  { label: 'حساب بانکی', key: 'shabaNumber' },
+  { label: 'سجامی', key: 'isSejamLabel' },
 ];
 
 const customersWithLabels = computed(() =>
   props.customers.map(c => ({
     ...c,
-    profitIssueLabel: c.isProfitIssue ? 'دارد' : 'ندارد',
+    isSejamLabel: c.isSejam ? 'هست' : 'نیست',
+    lastNameDisplay: c.person?.isCompany ? c.person.companyName : c.person?.lastName
   }))
 );
 

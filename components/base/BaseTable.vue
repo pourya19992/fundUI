@@ -68,7 +68,7 @@
     </table>
 
     <!-- Pagination -->
-    <div class="mt-4">
+    <div class="mt-4" v-if="totalPages > 1">
       <Pagination
         :current-page="currentPage"
         :total-pages="totalPages"
@@ -113,15 +113,15 @@ const props = defineProps({
   },
   currentPage: {
     type: Number,
-    required: true,
+    default: 0,
   },
   totalPages: {
     type: Number,
-    required: true,
+    default: 1,
   },
   pageSize: {
     type: Number,
-    required: true,
+    default: 10,
   },
 });
 
@@ -182,6 +182,8 @@ const handleDeleteClick = (item: TItem) => {
 const onSearchChange = () => {
   emit('search', { ...searchValues.value });
 };
+
+const showPagination = computed(() => props.totalPages > 1 && props.pageSize > 0);
 </script>
 
 <style scoped>

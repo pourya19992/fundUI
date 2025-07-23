@@ -27,7 +27,11 @@
         @delete="handleDelete"
         @pageChange="handlePageChange"
         @pageSizeChange="handlePageSizeChange"
-    />
+    >
+    <template #additional-actions="{ item}">
+            <CustomerBankAccount :customer="item" />
+        </template>
+  </CustomerTable>
     </div>
 </div>
 </template>
@@ -40,6 +44,7 @@ import CustomerTable from './sections/CustomerTable.vue';
 import CustomerForm from './sections/CustomerForm.vue';
 import type { CustomerResponseDto, CustomerRequestDto } from '@/services/baseInformation/customerService';
 import { BASE_URL } from '@/utils/constants';
+import CustomerBankAccount from './sections/CustomerBankAccount.vue';
 
 interface NotificationState {
 show: boolean;
@@ -53,13 +58,11 @@ const customers = ref<CustomerResponseDto[]>([]);
 const isLoading = ref(false);
 const isLoadingList = ref(false);
 
-// ویرایش
 const handleEdit = async (customer: CustomerResponseDto) => {
   try {
-    // گرفتن اطلاعات کامل مشتری (اگر لازم است)
     const data: CustomerRequestDto = await customerService.getCustomer(customer.id!);
     if (data && customerFormRef.value) {
-      customerFormRef.value.openForEdit(data); // فرم شما باید با CustomerRequestDto کار کند
+      customerFormRef.value.openForEdit(data);
     }
   } catch (error: any) {
     console.error('Error loading customer details:', error);
@@ -67,13 +70,11 @@ const handleEdit = async (customer: CustomerResponseDto) => {
   }
 };
 
-// حذف
 const handleDelete = async (customer: CustomerResponseDto) => {
   if (!customer.id) return;
   if (confirm(`آیا از حذف مشتری "${customer.person?.firstName} ${customer.person?.lastName}" اطمینان دارید؟`)) {
     isLoading.value = true;
     try {
-      // حذف با id مشتری
       await customerService.removeCustomer(customer.id);
       showNotification('مشتری با موفقیت حذف شد', 'success');
       await loadCustomers();
@@ -86,7 +87,6 @@ const handleDelete = async (customer: CustomerResponseDto) => {
   }
 };
 
-// افزودن یا ویرایش (در فرم)
 const submitCustomer = async (customer: CustomerRequestDto) => {
   if (customer.id) {
     await customerService.editCustomer(customer);

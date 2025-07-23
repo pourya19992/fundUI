@@ -8,13 +8,13 @@
       <!--      <p class="text-gray-700 text-center mb-8">سلام.</p>-->
 
       <!-- Image Section -->
-      <div class="mb-8">
-        <img
-            src="~/assets/images/main-image.jpg"
-            alt="صندوق درآمد ثابت"
-            class="w-full h-64 object-cover rounded-lg shadow-md"
-        />
-      </div>
+      <!-- <div class="mb-8"> -->
+        <!-- <img -->
+            <!-- src="~/assets/images/main-image.jpg" -->
+            <!-- alt="صندوق درآمد ثابت" -->
+            <!-- class="w-full h-64 object-cover rounded-lg shadow-md" -->
+        <!-- /> -->
+      <!-- </div> -->
 
       <!-- Slideshow Section (Vue3 Carousel) -->
       <div class="mb-8">
@@ -29,14 +29,23 @@
         </Carousel>
       </div>
 
-      <!-- Button Section -->
-      <div class="text-center">
-        <NuxtLink to="/auth/login">
-          <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
-            ورود به صندوق
+      <div class="flex flex-wrap gap-4 justify-center my-8">
+        <div
+          v-for="box in infoBoxes"
+          :key="box.key"
+          class="bg-blue-600 text-white rounded-lg shadow-md p-4 min-w-[220px] flex flex-col items-center"
+        >
+          <div class="text-base font-bold mb-1">{{ box.title }}</div>
+          <div class="text-xl font-mono mb-2">{{ box.value }}</div>
+          <button
+            class="bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-100 transition"
+            @click="fetchBoxData(box.key)"
+          >
+            بروزرسانی
           </button>
-        </NuxtLink>
+        </div>
       </div>
+
     </div>
 
   </div>
@@ -45,18 +54,27 @@
 
 <script setup>
 import {Carousel, Slide} from "vue3-carousel";
-import "vue3-carousel/dist/carousel.css"; // استایل‌های مورد نیاز
-
-// ایمپورت تصاویر
+import "vue3-carousel/dist/carousel.css";
 import slide1 from "~/assets/images/slide1.jpg";
 import slide2 from "~/assets/images/slide2.jpg";
 
-// داده‌های اسلایدشو
 const slides = [
   {image: slide1, alt: "اسلاید ۱"},
   {image: slide2, alt: "اسلاید ۲"}
 ];
 
+const infoBoxes = ref([
+  { key: 'investmentDate', title: 'اطلاعات سرمایه گذاری به تاریخ', value: '۱۴۰۳/۰۴/۲۷' },
+  { key: 'nav', title: 'کل خالص ارزش دارایی ها', value: '۷۲,۰۶۰,۸۷۸,۳۴۶,۲۴۰ ریال' },
+  { key: 'unitRevokePrice', title: 'قیمت ابطال هر واحد سرمایه گذاری', value: '۱۰,۶۶۰,۶۵ ریال' },
+  { key: 'unitIssuePrice' , title: 'قیمت صدور هر واحد سرمایه گذاری' , value: '۱۰,۶۶۰,۶۵ ریال'}
+
+])
+
+function fetchBoxData(key) {
+
+  alert(`فراخوانی سرویس برای: ${key}`)
+}
 
 definePageMeta({
   layout: 'default',

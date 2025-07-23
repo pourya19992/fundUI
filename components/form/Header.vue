@@ -27,7 +27,7 @@
               <HomeIcon class="h-6 w-6" />
             </button>
           </li>
-          <li>
+          <li v-if="route.path !== '/'">
             <button
               @click="handleLogout"
               class="p-2 bg-gray-100 hover:bg-blue-200 rounded-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors duration-300"
@@ -39,6 +39,13 @@
       </nav>
     </div>
     <div class="container mx-auto flex justify-between items-center py-4 px-6">
+      <div class="flex-1 flex justify-start">
+        <NuxtLink v-if="route.path === '/'" to="/auth/login">
+          <button class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
+            ورود به صندوق
+          </button>
+        </NuxtLink>
+      </div>
       <div class="flex-1 flex justify-end">
         <h1 class="text-xl font-bold text-blue-600">صندوق سرمایه گذاری</h1>
       </div>
@@ -53,21 +60,7 @@
         @mouseenter="appStore.sidebarOpen = true"
         @mouseleave="appStore.sidebarOpen = false"
       >
-        <button @click.stop="() => router.push('/dashboard')" class="btn-menu" aria-label="داشبورد">
-          <ReportIcon class="h-6 w-6" />
-        </button>
-        <button @click.stop="() => router.push('/dashboard/profile')" class="btn-menu" aria-label="پروفایل">
-          <ProfileIcon class="h-6 w-6 text-gray-600" />
-        </button>
-        <button @click.stop="() => router.push('/dashboard/settings')" class="btn-menu" aria-label="تنظیمات">
-          <GearIcon class="h-6 w-6 text-gray-600" />
-        </button>
-        <button @click.stop="() => router.push('/dashboard/administration/branch')" class="btn-menu" aria-label="شعب">
-          <SheetIcon class="h-6 w-6 text-gray-600" />
-        </button>
-        <button @click.stop="() => router.push('/dashboard/administration/calendar')" class="btn-menu" aria-label="تقویم">
-          <CalendarIcon class="h-6 w-6 text-gray-600" />
-        </button>
+        <!-- دکمه‌های منو -->
       </div>
     </transition>
   </header>

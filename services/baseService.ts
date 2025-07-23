@@ -10,6 +10,20 @@ export interface ApiErrorResponse {
   time: string;
 }
 
+export interface PagedResponse<T> {
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  content: T[];
+  number: number;
+  sort: any;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  pageable: any;
+  empty: boolean;
+}
+
 export const createBaseService = (baseURL: string) => {
   const apiClient: AxiosInstance = axios.create({
     baseURL,

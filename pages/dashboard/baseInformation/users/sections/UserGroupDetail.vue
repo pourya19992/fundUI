@@ -15,7 +15,7 @@
         :is-submitting="isUpdating"
         @submit="assignUserGroups"
         @cancel="closeModal"
-        size="2xl" >
+        size="sm" >
         <template #form-fields>
         <div class="mb-4">
             <input

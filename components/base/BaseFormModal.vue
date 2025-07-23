@@ -1,7 +1,7 @@
 <template>
   <Modal :is-open="isOpen" @close="onClose" :size="size">
     <template #body>
-      <div class="max-h-[70vh] overflow-y-auto p-1">
+      <div class="p-6 bg-white rounded-lg shadow-xl max-h-[70vh] overflow-y-auto p-1">
         <h3 class="text-center text-lg font-semibold mb-4">{{ title }}</h3>
         <!-- Slot for form fields -->
         <slot name="form-fields"></slot>
@@ -11,6 +11,7 @@
     <template #footer>
       <div class="flex justify-center gap-4">
         <button
+          v-if="showSubmitButton"
           @click="handleSubmit"
           class="btn-primary w-24"
           :disabled="isLoading || isSubmitting"
@@ -18,6 +19,7 @@
           {{ submitButtonText }}
         </button>
         <button
+          v-if="showCancelButton"
           @click="handleCancel"
           class="btn-secondary w-24"
         >
@@ -29,40 +31,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import Modal from "@/components/Modal.vue";
 
-const props = defineProps({
-  modelValue: { // Use modelValue for v-model support
-    type: Boolean,
-    default: false,
-  },
-  title: {
-    type: String,
-    default: "Modal Title",
-  },
-  submitButtonText: {
-    type: String,
-    default: "Save",
-  },
-  cancelButtonText: {
-    type: String,
-    default: "Cancel",
-  },
-  isLoading: { // Prop to indicate loading state from parent
-    type: Boolean,
-    default: false,
-  },
-  isSubmitting: { // Prop to indicate submitting state from parent
-    type: Boolean,
-    default: false,
-  },
-
-  size: {
-    type: String,
-    default: "lg"
-  }
-});
+const props = defineProps<{
+  modelValue: boolean;
+  title: string;
+  submitButtonText?: string;
+  cancelButtonText?: string;
+  isLoading?: boolean;
+  isSubmitting?: boolean;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  showSubmitButton?: boolean;
+  showCancelButton?: boolean;
+}>();
 
 const emit = defineEmits(['update:modelValue', 'submit', 'cancel']);
 
@@ -85,6 +67,10 @@ const handleSubmit = () => {
 const handleCancel = () => {
   onClose();
 };
+
+// Default values for button visibility
+const showSubmitButton = props.showSubmitButton !== true;
+const showCancelButton = props.showCancelButton !== true;
 
 // Expose methods for parent to control modal
 defineExpose({
