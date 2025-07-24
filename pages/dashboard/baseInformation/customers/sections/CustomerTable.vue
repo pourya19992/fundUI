@@ -39,9 +39,9 @@ const columns = [
   { label: 'نام خانوادگی/شرکت', key: 'lastNameDisplay' },
   { label: 'کد ملی', key: 'person.nationalCode' },
   { label: 'موبایل', key: 'person.cellPhone' },
-  { label: 'وضعیت', key: 'customerStatusName' },
-  { label: 'کد تفصیلی', key: 'dlNumber' },
-  { label: 'حساب بانکی', key: 'shabaNumber' },
+  { label: 'وضعیت', key: 'customerStatus.name' },
+  { label: 'کد تفصیلی', key: 'detailLedger.code' },
+  { label: 'حساب بانکی', key: 'bankAccount.shabaNumber' },
   { label: 'سجامی', key: 'isSejamLabel' },
 ];
 

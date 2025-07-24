@@ -1,5 +1,6 @@
 import { createBaseService } from '../baseService';
 import type { PagedResponse } from '../baseService';
+import type {DetailLedgerDto} from '../accounting/detailLedgerService'
 
 const API_URL = '/api/v1/baseInformation/customer';
 
@@ -66,7 +67,7 @@ export interface CustomerBankAccount {
 export interface CustomerBankAccountRequest {
   id?: number;
   customerId: string;
-  bankAccount?: BankAccount
+  bankAccounts?: [BankAccount]
 }
 
 export interface BankAccount {
@@ -114,13 +115,9 @@ export interface PersonDto {
 export interface CustomerResponseDto {
   id: number;
   detailLedgerId: number;
-  dlNumber?: string;
-  customerStatusId: number;
-  customerStatusName?: string;
-  customerBankAccountId?: number;
-  customerBankName?: string;
-  accountNumber?: string;
-  shabaNumber?: string;
+  detailLedger?: DetailLedgerDto;
+  customerStatus?: CustomerStatus;
+  bankAccount?: BankAccount ;
   person?: PersonDto;
   comments?: string;
   isSmsSend: boolean;
@@ -131,11 +128,19 @@ export interface CustomerResponseDto {
   isEpaymentCustomer: boolean;
 }
 
+export interface CustomerStatus {
+  id: number;
+  name: string;
+}
+
 export interface CustomerRequestDto {
   id?: number;
-  detailLedgerId?: number;
-  customerStatusId: number;
+  detailLedger?: DetailLedgerDto;
+  customerStatus?: CustomerStatus;
   customerBankAccountId?: number;
+  customerBankName?: string;
+  accountNumber?: string;
+  shabaNumber?: string;
   person?: PersonDto;
   comments?: string;
   isSmsSend: boolean;

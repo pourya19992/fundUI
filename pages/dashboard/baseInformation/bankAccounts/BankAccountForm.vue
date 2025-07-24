@@ -119,7 +119,7 @@ isLoading.value = true;
 try {
     await customerService.addCustomerBankAccount({
     customerId: String(props.customerId),
-    bankAccount: {
+    bankAccounts: [{
         id: 0,
         isActive: true,
         bankAccountType: { id: Number(form.bankAccountTypeId), name: '' },
@@ -127,7 +127,7 @@ try {
         accountNumber: form.accountNumber,
         annualinterest: 0,
         shabaNumber: form.shabaNumber
-    }
+    }]
     });
     notify({ description: 'حساب بانکی با موفقیت اضافه شد', status: 'success' });
     emit('submit');

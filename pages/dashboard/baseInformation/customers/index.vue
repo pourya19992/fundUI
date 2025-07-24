@@ -60,7 +60,7 @@ const isLoadingList = ref(false);
 
 const handleEdit = async (customer: CustomerResponseDto) => {
   try {
-    const data: CustomerRequestDto = await customerService.getCustomer(customer.id!);
+    const data: CustomerResponseDto = await customerService.getCustomer(customer.id!);
     if (data && customerFormRef.value) {
       customerFormRef.value.openForEdit(data);
     }

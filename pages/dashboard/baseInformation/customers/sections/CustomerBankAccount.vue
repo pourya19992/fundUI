@@ -2,7 +2,7 @@
 <div>
     <BaseTooltip label="شماره حساب‌ها">
         <div class="cursor-pointer" @click="openModal">
-        <PermissionIcon />
+        <CustomerBankAccountIcon />
         </div>
     </BaseTooltip>
 
@@ -43,7 +43,6 @@
 import { ref, computed } from 'vue';
 import BaseTooltip from '@/components/base/BaseTooltip.vue';
 import BaseFormModal from '@/components/base/BaseFormModal.vue';
-import PermissionIcon from '@/components/icons/PermissionIcon.vue';
 import { useNotify } from '@/helpers/hooks/useNotify';
 import { createCustomerService } from "@/services/baseInformation/customerService";
 import type { CustomerResponseDto } from '@/services/baseInformation/customerService';
@@ -52,6 +51,7 @@ import type { Bank, BankAccountType } from '@/services/administration/bankServic
 import { createBankService } from '@/services/administration/bankService';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BankAccountForm from '@/pages/dashboard/baseInformation/bankAccounts/BankAccountForm.vue';
+import CustomerBankAccountIcon from '@/components/icons/CustomerBankAccountIcon.vue';
 
 const props = defineProps<{ customer: CustomerResponseDto }>();
 
@@ -149,7 +149,7 @@ const addNewBankAccount = async () => {
   try {
     await customerService.addCustomerBankAccount({
       customerId: String(props.customer.id),
-      bankAccount: {
+      bankAccounts: [{
         accountNumber: newAccount.value.accountNumber,
         shabaNumber: newAccount.value.shabaNumber,
         id: 0,
@@ -157,7 +157,7 @@ const addNewBankAccount = async () => {
         bankAccountType: { id: newAccount.value.bankAccountTypeId, name: '' },
         bank: { id: newAccount.value.bankId, name: '', isValid: true },
         annualinterest: 0
-      }
+      }]
     });
     notify({
       description: 'حساب جدید با موفقیت اضافه شد',

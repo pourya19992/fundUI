@@ -102,15 +102,23 @@
         <!-- Customer fields -->
         <div>
             <label class="block text-sm">وضعیت مشتری</label>
-            <input v-model="form.customerStatusId" type="number" class="input-field" />
+            <select v-model="form.customerStatus!.id" class="input-field" >
+            <option :value=1 >فعال</option>
+            <option :value=2>معلق</option>
+            <option :value=2>غیر فعال</option>
+            </select>
         </div>
         <div>
-            <label class="block text-sm">دفتر کل تفصیلی</label>
-            <input v-model="form.detailLedgerId" type="number" class="input-field" />
+            <label class="block text-sm">کد تفصیلی</label>
+            <input v-model="form.detailLedger!.code" type="number" class="input-field" />
         </div>
         <div>
-            <label class="block text-sm">حساب بانکی مشتری</label>
-            <input v-model="form.customerBankAccountId" type="number" class="input-field" />
+            <label class="block text-sm">شماره حساب</label>
+            <input v-model="form.bankAccount!.accountNumber" type="number" class="input-field" />
+        </div>
+        <div>
+            <label class="block text-sm">شماره شبا</label>
+            <input v-model="form.bankAccount!.shabaNumber" type="text" class="input-field" />
         </div>
         <div>
             <label class="block text-sm">توضیحات</label>
@@ -166,7 +174,7 @@ import { ref, reactive, defineExpose } from "vue";
 import BaseFormModal from "@/components/base/BaseFormModal.vue";
 import { useNotify } from "@/helpers/hooks/useNotify";
 import { createCustomerService } from '@/services/baseInformation/customerService';
-import type { CustomerRequestDto } from "@/services/baseInformation/customerService";
+import type { CustomerResponseDto } from "@/services/baseInformation/customerService";
 import { BASE_URL } from '@/utils/constants';
 
 const emit = defineEmits(['submit']);
@@ -201,28 +209,29 @@ const isModalOpen = ref(false);
 const isEditMode = ref(false);
 const isSubmitting = ref(false);
 
-const form = ref<CustomerRequestDto>({
-person: { ...defaultPerson },
-customerStatusId: 0,
-detailLedgerId: undefined,
-customerBankAccountId: undefined,
-comments: '',
-profitRate: 0,
-isEpaymentCustomer: false,
-isSejam: false,
-isSmsSend: false,
-isVat: false,
-isProfitIssue: false
+const form = ref<CustomerResponseDto>({
+  id: 0,
+  detailLedgerId: 0,
+  person: { ...defaultPerson },
+  customerStatus: { id: 0 , name: ""},
+  comments: '',
+  profitRate: 0,
+  isEpaymentCustomer: false,
+  isSejam: false,
+  isSmsSend: false,
+  isVat: false,
+  isProfitIssue: false
 });
 
 const openModalForAdd = () => {
 isEditMode.value = false;
 isModalOpen.value = true;
 form.value = {
+    id: 0,
+    detailLedgerId: 0,
     person: { ...defaultPerson },
-    customerStatusId: 0,
-    detailLedgerId: undefined,
-    customerBankAccountId: undefined,
+    customerStatus: { id: 0 , name: ""},
+    detailLedger: { name: "", code: "", detailLedgerTypeId: 0, isActive: true },
     comments: '',
     profitRate: 0,
     isEpaymentCustomer: false,
@@ -233,7 +242,7 @@ form.value = {
 };
 };
 
-const openForEdit = (data: CustomerRequestDto) => {
+const openForEdit = (data: CustomerResponseDto) => {
 isEditMode.value = true;
 isModalOpen.value = true;
 form.value = {
@@ -246,10 +255,11 @@ const closeModal = () => {
 isModalOpen.value = false;
 isEditMode.value = false;
 form.value = {
+    id: 0,
+    detailLedgerId: 0,
     person: { ...defaultPerson },
-    customerStatusId: 0,
-    detailLedgerId: undefined,
-    customerBankAccountId: undefined,
+    customerStatus: { id: 0 , name: ""},
+    detailLedger: { name: "", code: "", detailLedgerTypeId: 0, isActive: true },
     comments: '',
     profitRate: 0,
     isEpaymentCustomer: false,

@@ -10,6 +10,11 @@ export interface ApiErrorResponse {
   time: string;
 }
 
+export interface ApiResponse {
+  message: string;
+  data?: any;
+}
+
 export interface PagedResponse<T> {
   totalElements: number;
   totalPages: number;
