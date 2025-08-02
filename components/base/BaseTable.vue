@@ -172,6 +172,7 @@ const onPageSizeChange = (size: number) => {
 };
 
 const handleEditClick = (item: TItem) => {
+  console.log('Edit icon clicked', item); // این لاگ را اضافه کن
   emit('edit', item);
 };
 

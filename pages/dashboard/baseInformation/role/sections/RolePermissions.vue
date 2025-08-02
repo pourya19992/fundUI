@@ -73,7 +73,6 @@
 
     const props = defineProps<{ role: Role }>();
 
-    const config = useRuntimeConfig();
     const permissionService = createPermissionService(BASE_URL);
     const roleService = createRoleService(BASE_URL);
 

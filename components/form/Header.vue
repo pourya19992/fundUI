@@ -47,7 +47,7 @@
         </NuxtLink>
       </div>
       <div class="flex-1 flex justify-end">
-        <h1 class="text-xl font-bold text-blue-600">صندوق سرمایه گذاری رمز ارز</h1>
+        <h1 class="text-xl font-bold text-blue-600">صندوق سرمایه گذاری در ارز</h1>
       </div>
     </div>
     <!-- Mini Sidebar (Always, when sidebar is closed) -->

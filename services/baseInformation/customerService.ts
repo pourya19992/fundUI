@@ -61,17 +61,16 @@ export interface Customer {
 export interface CustomerBankAccount {
   id: number;
   customerId: string;
-  bankAccounts?: BankAccount
-}
+  bankAccount?: BankAccount}
 
-export interface CustomerBankAccountRequest {
+export interface CustomerBankAccountDto {
   id?: number;
   customerId: string;
-  bankAccounts?: [BankAccount]
+  bankAccounts?: BankAccount[]
 }
 
 export interface BankAccount {
-  id: number;
+  id?: number;
   isActive: boolean;
   bankAccountType: {
     id: number;
@@ -149,12 +148,6 @@ export interface CustomerRequestDto {
   isProfitIssue: boolean;
   isVat: boolean;
   isEpaymentCustomer: boolean;
-}
-
-export interface CustomerBankAccountDto {
-  id?: number;
-  customerId: number;
-  bankAccountId: number;
 }
 
 interface ApiResponse {
@@ -240,7 +233,7 @@ export const createCustomerService = (baseURL: string) => {
     },
 
     // Add customer bank account
-    async addCustomerBankAccount(bankAccount: CustomerBankAccountRequest): Promise<ApiResponse> {
+    async addCustomerBankAccount(bankAccount: CustomerBankAccountDto): Promise<ApiResponse> {
       try {
         const response = await apiClient.post(`${API_URL}/bankAccount/add`, bankAccount);
         return {
@@ -252,9 +245,9 @@ export const createCustomerService = (baseURL: string) => {
     },
 
     // Edit customer bank account
-    async editCustomerBankAccount(bankAccount: CustomerBankAccountDto): Promise<ApiResponse> {
+    async editCustomerBankAccount(customerBankAccount: CustomerBankAccount): Promise<ApiResponse> {
       try {
-        const response = await apiClient.put(`${API_URL}/bankAccount/edit`, bankAccount);
+        const response = await apiClient.put(`${API_URL}/bankAccount/edit`, customerBankAccount);
         return {
           message: response.data.message || 'حساب بانکی با موفقیت ویرایش شد'
         };

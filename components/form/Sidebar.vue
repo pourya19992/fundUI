@@ -40,29 +40,29 @@ const appStore = useAppStore();
 
 const sidebarGroups = [
   {
-    title: 'مدیریت',
+    title: 'راهبری سیستم',
     key: 'administration',
     items: [
       { label: 'شعب', to: '/dashboard/administration/branch' },
       { label: 'تقویم', to: '/dashboard/administration/calendar' },
       { label: 'صندوق', to: '/dashboard/administration/fund' },
+      { label: 'کاربران', to: '/dashboard/baseInformation/users' },
     ],
   },
   {
-    title: 'اطلاعات پایه',
+    title: 'دسترسی ها',
     key: 'baseInformation',
     items: [
       { label: 'مجوزها', to: '/dashboard/baseInformation/permissions' },
       { label: 'نقش‌ها', to: '/dashboard/baseInformation/role' },
-      { label: 'کاربران', to: '/dashboard/baseInformation/users' },
       { label: 'گروه‌های کاربری', to: '/dashboard/baseInformation/userGroup' },
-      { label: 'سرمایه گذاران', to: '/dashboard/baseInformation/customers'},
     ],
   },
   {
-    title: 'عمومی',
+    title: 'اطلاعت پایه',
     key: 'general',
     items: [
+      { label: 'سرمایه گذاران', to: '/dashboard/baseInformation/customers'},
       { label: 'داشبورد', to: '/dashboard' },
       { label: 'پروفایل', to: '/dashboard/profile' },
       { label: 'تنظیمات', to: '/dashboard/settings' },

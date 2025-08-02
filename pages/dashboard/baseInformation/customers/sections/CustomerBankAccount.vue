@@ -24,14 +24,16 @@
                   :is-loading="isLoading"
                   :colspan="5"
                   class="w-full text-base text-right"
+                  @edit="handleEdit"
+                  @delete="handleDelete"
                 />
             </div>
             <div v-else class="mb-4 text-gray-500 text-center">حسابی ثبت نشده است.</div>
             <div class="flex justify-end mt-4">
               <BankAccountForm
-                ref="showBankAccountForm"
+                ref="bankAccountFormRef"
                 :customer-id="props.customer.id"
-                @submit="onBankAccountAdded"
+                @submit="loadData"
               />
             </div>
         </template>
@@ -40,13 +42,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import BaseTooltip from '@/components/base/BaseTooltip.vue';
 import BaseFormModal from '@/components/base/BaseFormModal.vue';
 import { useNotify } from '@/helpers/hooks/useNotify';
 import { createCustomerService } from "@/services/baseInformation/customerService";
-import type { CustomerResponseDto } from '@/services/baseInformation/customerService';
-import type { BankAccount } from '@/services/baseInformation/customerService';
+import type {  CustomerResponseDto , BankAccount} from '@/services/baseInformation/customerService';
+import type { CustomerBankAccount } from '@/services/baseInformation/customerService';
 import type { Bank, BankAccountType } from '@/services/administration/bankService';
 import { createBankService } from '@/services/administration/bankService';
 import BaseTable from '@/components/base/BaseTable.vue';
@@ -61,7 +63,7 @@ const notify = useNotify();
 const isModalOpen = ref(false);
 const isLoading = ref(false);
 const isUpdating = ref(false);
-const customerBankAccounts = ref<BankAccount[]>([]);
+const customerBankAccounts = ref<CustomerBankAccount[]>([]);
 
 const bankService = createBankService(BASE_URL);
 const banks = ref<Bank[]>([]);
@@ -74,15 +76,34 @@ const newAccount = ref({
   bankAccountTypeId: null as number | null
 });
 
-const showBankAccountForm = ref(false);
+const bankAccountFormRef = ref<InstanceType<typeof BankAccountForm> | null>(null);
 
-function openBankAccountForm() {
-  showBankAccountForm.value = true;
+interface NotificationState {
+  show: boolean;
+  message: string;
+  type: 'success' | 'error';
 }
-function onBankAccountAdded() {
-  showBankAccountForm.value = false;
-  loadData();
-}
+
+const showNotification = (message: string, type: 'success' | 'error') => {
+  notification.value = {
+    show: true,
+    message,
+    type
+  };
+  setTimeout(() => {
+    closeNotification();
+  }, 3000);
+};
+
+const notification = ref<NotificationState>({
+  show: false,
+  message: '',
+  type: 'success'
+});
+
+const closeNotification = () => {
+  notification.value.show = false;
+};
 
 const bankAccountColumns = [
   { label: 'بانک', key: 'bank.name' },
@@ -95,7 +116,12 @@ const bankAccountColumns = [
 const customerBankAccountsWithLabel = computed(() =>
   customerBankAccounts.value.map(acc => ({
     ...acc,
-    isActiveLabel: acc.isActive ? 'بله' : 'خیر'
+    accountNumber: acc.bankAccount?.accountNumber ?? '',
+    shabaNumber: acc.bankAccount?.shabaNumber ?? '',
+    bank: acc.bankAccount?.bank ?? {},
+    bankAccountType: acc.bankAccount?.bankAccountType ?? {},
+    isActiveLabel: acc.bankAccount?.isActive ? 'بله' : 'خیر',
+    id: acc.id
   }))
 );
 
@@ -114,6 +140,7 @@ const loadBankData = async () => {
 
 const openModal = async () => {
   isModalOpen.value = true;
+  console.log('isModalOpen', isModalOpen.value);
   await Promise.all([loadData(), loadBankData()]);
 };
 
@@ -128,8 +155,8 @@ const loadData = async () => {
   try {
     if (!props.customer.id) return;
     const res = await customerService.getCustomerBankAccounts(props.customer.id);
-    console.log('bankAccounts:', res.bankAccounts); // Debug log
-    customerBankAccounts.value = res.bankAccounts || [];
+    customerBankAccounts.value = Array.isArray(res) ? res : (res ? [res] : []);
+    console.log('aaa', Array.isArray(res), res)
   } catch (error) {
     notify({
       description: 'خطا در بارگذاری حساب‌ها',
@@ -137,6 +164,41 @@ const loadData = async () => {
     });
   } finally {
     isLoading.value = false;
+  }
+};
+
+const handleEdit = (customerBankAccount: CustomerBankAccount) => {
+  console.log('handleEdit customerBankAccount:', customerBankAccount);
+  const editData = {
+    id: customerBankAccount.id,
+    customerId: String(props.customer.id),
+    bankAccount: {
+      id: customerBankAccount.bankAccount?.id ?? 0,
+      accountNumber: customerBankAccount.bankAccount?.accountNumber ?? '',
+      shabaNumber: customerBankAccount.bankAccount?.shabaNumber ?? '',
+      bank: customerBankAccount.bankAccount?.bank ?? { id: 0, name: '', isValid: true },
+      bankAccountType: customerBankAccount.bankAccount?.bankAccountType ?? { id: 0, name: '' },
+      isActive: customerBankAccount.bankAccount?.isActive ?? true,
+      annualinterest: customerBankAccount.bankAccount?.annualinterest ?? 0
+    }
+  };
+  console.log('handleEdit editData:', editData);
+  bankAccountFormRef.value?.openForEdit(editData);
+};
+
+
+const handleDelete = async (customerBankAccount: CustomerBankAccount) => {
+  if (confirm('آیا از حذف این حساب اطمینان دارید؟')) {
+    isLoading.value = true;
+    try {
+      await customerService.removeCustomerBankAccount(customerBankAccount.id);
+      notify({ description: 'حساب با موفقیت حذف شد', status: 'success' });
+      await loadData();
+    } catch (error) {
+      notify({ description: 'خطا در حذف حساب', status: 'error' });
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 
@@ -177,6 +239,17 @@ const addNewBankAccount = async () => {
     isUpdating.value = false;
   }
 };
+
+onMounted(() => {
+  // Remove the problematic global assignment
+});
+
+watch(isModalOpen, (val) => {
+  if (val) {
+    // Remove the problematic global assignment
+  }
+});
+
 </script>
 
 <style scoped>

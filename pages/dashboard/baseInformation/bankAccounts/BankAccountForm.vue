@@ -1,101 +1,172 @@
 <template>
 <div>
-    <button v-if="!isEditMode" @click="onOpen" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+    <button  @click="openModalForAdd" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
     حساب بانکی جدید
     </button>
 
-    <Modal :is-open="isOpen" @close="onClose">
-    <template #body>
+<BaseFormModal
+    v-model:modelValue="isModalOpen"
+    :title="isEditMode ? 'ویرایش شماره حساب' : 'شماره حساب جدید'"
+    submit-button-text="ثبت"
+    cancel-button-text="انصراف"
+    :is-loading="isSubmitting"
+    :is-submitting="isSubmitting"
+    @submit="handleSubmit"
+    @cancel="closeModal"
+    >
+    <template #form-fields>
+        <div class="space-y-4">
+
         <div>
-            <h3 class="text-center text-lg font-semibold mb-4">{{ isEditMode ? 'ویرایش شماره حساب' : 'شماره حساب جدید' }}</h3>
-            <div class="space-y-4">
-            <div>
             <label class="block text-sm">شماره حساب</label>
-            <input v-model="form.accountNumber" type="text" class="input-field" />
-            </div>
-            <div>
+            <input v-model="form.bankAccount.accountNumber" type="text" class="input-field" />
+        </div>
+        <div>
             <label class="block text-sm">شماره شبا</label>
-            <input v-model="form.shabaNumber" type="text" class="input-field" />
-            </div>
-            <div>
+            <input v-model="form.bankAccount.shabaNumber" type="text" class="input-field" />
+        </div>
+        <div>
             <label class="block text-sm">بانک</label>
-            <select v-model="form.bankId" class="input-field">
+            <select v-model="form.bankAccount.bank.id" class="input-field">
                 <option disabled value="">بانک را انتخاب کنید</option>
                 <option v-for="bank in banks" :key="bank.id" :value="bank.id">{{ bank.name }}</option>
             </select>
-            </div>
-            <div>
+        </div>
+        <div>
             <label class="block text-sm">نوع حساب</label>
-            <select v-model="form.bankAccountTypeId" class="input-field">
+            <select v-model="form.bankAccount.bankAccountType.id" class="input-field">
                 <option disabled value="">نوع حساب را انتخاب کنید</option>
                 <option v-for="type in bankAccountTypes" :key="type.id" :value="type.id">{{ type.name }}</option>
             </select>
+        </div>
+        <div>
+            <label class="block text-sm">سود سالانه</label>
+            <input v-model="form.bankAccount.annualinterest" type="text" class="input-field" />
+        </div>
+        <div class="flex items-center">
+            <input
+                id="isActive"
+                type="checkbox"
+                v-model="form.bankAccount.isActive"
+                class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+            />
+            <label for="isActive" class="ml-2 block text-sm text-gray-900">وضعیت</label>
             </div>
         </div>
-        </div>
     </template>
-    <template #footer>
-        <div class="flex justify-center gap-4">
-        <button @click="handleSubmit" class="btn-primary w-24" :disabled="isLoading">
-            ثبت
-        </button>
-        <button @click="onClose" class="btn-secondary w-24">
-            انصراف
-        </button>
-        </div>
-    </template>
-    </Modal>
+    </BaseFormModal>
 </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineExpose, watch, onMounted } from "vue";
-import Modal from "@/components/Modal.vue";
+import { ref, defineExpose } from "vue";
 import { useNotify } from "@/helpers/hooks/useNotify";
-import { createCustomerService } from '@/services/baseInformation/customerService';
+import BaseFormModal from "@/components/base/BaseFormModal.vue";
+import { createCustomerService, type BankAccount } from '@/services/baseInformation/customerService';
 import { createBankService } from '@/services/administration/bankService';
 import type { Bank, BankAccountType } from '@/services/administration/bankService';
+import type { CustomerBankAccount } from '@/services/baseInformation/customerService';
 
-const props = defineProps<{ customerId: number }>();
+// Define a type for the form that ensures bankAccount is always defined
+interface BankAccountFormData {
+  id: number;
+  customerId: string;
+  bankAccount: BankAccount;
+}
+
+const props = defineProps<{
+customerId: number | string,
+bankAccount?: BankAccount | null
+}>();
+
 const emit = defineEmits(['submit']);
 const notify = useNotify();
 
 const customerService = createCustomerService(BASE_URL);
 const bankService = createBankService(BASE_URL);
 
-const isOpen = ref(false);
-const isLoading = ref(false);
+const isModalOpen = ref(false);
 const isEditMode = ref(false);
+const isSubmitting = ref(false);
 
 const banks = ref<Bank[]>([]);
 const bankAccountTypes = ref<BankAccountType[]>([]);
 
-const form = reactive({
-accountNumber: '',
-shabaNumber: '',
-bankId: '',
-bankAccountTypeId: ''
+const form = ref<BankAccountFormData>({
+    id: 0,
+    customerId: String(props.customerId),
+    bankAccount: {
+    id: 0,
+    accountNumber: '',
+    shabaNumber: '',
+    bank: { id: 0, name: '', isValid: true },
+    bankAccountType: { id: 0, name: '' },
+    isActive: true,
+    annualinterest: 0
+}
 });
 
-const onOpen = async () => {
+
+const openModalForAdd = async () => {
 isEditMode.value = false;
-isOpen.value = true;
-resetForm();
+isModalOpen.value = true;
+// Reset form to initial state
+form.value = {
+    id: 0,
+    customerId: String(props.customerId),
+    bankAccount: {
+    id: 0,
+    accountNumber: '',
+    shabaNumber: '',
+    bank: { id: 0, name: '', isValid: true },
+    bankAccountType: { id: 0, name: '' },
+    isActive: true,
+    annualinterest: 0
+}
+};
 await loadBankData();
 };
 
-const onClose = () => {
-isOpen.value = false;
-isEditMode.value = false;
-resetForm();
+const openForEdit = async (data: BankAccountFormData) => {
+console.log('openForEdit data:', data);
+isEditMode.value = true;
+isModalOpen.value = true;
+await loadBankData();
+form.value = {
+    id: data.id,
+    customerId: data.customerId,
+    bankAccount: {
+    id: data.bankAccount.id,
+    accountNumber: data.bankAccount.accountNumber,
+    shabaNumber: data.bankAccount.shabaNumber,
+    bank: data.bankAccount.bank,
+    bankAccountType: data.bankAccount.bankAccountType,
+    isActive: data.bankAccount.isActive,
+    annualinterest: data.bankAccount.annualinterest
+    }
+};
+console.log('form.value after setting:', form.value);
 };
 
-const resetForm = () => {
-form.accountNumber = '';
-form.shabaNumber = '';
-form.bankId = '';
-form.bankAccountTypeId = '';
+const closeModal = () => {
+isModalOpen.value = false;
+isEditMode.value = false;
+// Reset form to initial state
+form.value = {
+    id: 0,
+    customerId: String(props.customerId),
+    bankAccount: {
+    id: 0,
+    accountNumber: '',
+    shabaNumber: '',
+    bank: { id: 0, name: '', isValid: true },
+    bankAccountType: { id: 0, name: '' },
+    isActive: true,
+    annualinterest: 0
+}
 };
+};
+
 
 const loadBankData = async () => {
 try {
@@ -111,35 +182,45 @@ try {
 };
 
 const handleSubmit = async () => {
-if (!form.accountNumber || !form.shabaNumber || !form.bankId || !form.bankAccountTypeId) {
+if (
+  !form.value.bankAccount.accountNumber ||
+  !form.value.bankAccount.shabaNumber ||
+  !form.value.bankAccount.bank ||
+  !form.value.bankAccount.bankAccountType
+) {
     notify({ description: 'لطفاً همه فیلدها را پر کنید', status: 'warning' });
     return;
 }
-isLoading.value = true;
+isSubmitting.value = true;
 try {
+    if(form.value.id) {
+    await customerService.editCustomerBankAccount(form.value);
+    notify({ description: "شماره حساب با موفقیت ویرایش شد.", status: "success" });
+    } else {
     await customerService.addCustomerBankAccount({
     customerId: String(props.customerId),
     bankAccounts: [{
         id: 0,
         isActive: true,
-        bankAccountType: { id: Number(form.bankAccountTypeId), name: '' },
-        bank: { id: Number(form.bankId), name: '', isValid: true },
-        accountNumber: form.accountNumber,
+        bankAccountType: { id: Number(form.value.bankAccount.bankAccountType.id), name: '' },
+        bank: { id: Number(form.value.bankAccount.bank.id), name: '', isValid: true },
+        accountNumber: form.value.bankAccount.accountNumber,
         annualinterest: 0,
-        shabaNumber: form.shabaNumber
+        shabaNumber: form.value.bankAccount.shabaNumber
     }]
     });
     notify({ description: 'حساب بانکی با موفقیت اضافه شد', status: 'success' });
+    }
     emit('submit');
-    onClose();
-} catch (error) {
-    notify({ description: 'خطا در افزودن حساب بانکی', status: 'error' });
+    closeModal();
+} catch (error: any) {
+    notify({ description: error.message || 'خطا در افزودن حساب بانکی', status: 'error' });
 } finally {
-    isLoading.value = false;
+    isSubmitting.value = false;
 }
 };
 
-defineExpose({ onOpen });
+defineExpose({ openModalForAdd, openForEdit });
 </script>
 
 <style scoped>
