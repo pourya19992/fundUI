@@ -47,6 +47,7 @@ const sidebarGroups = [
       { label: 'تقویم', to: '/dashboard/administration/calendar' },
       { label: 'صندوق', to: '/dashboard/administration/fund' },
       { label: 'کاربران', to: '/dashboard/baseInformation/users' },
+      { label: 'پارامترها', to: '/dashboard/administration/params'}
     ],
   },
   {
@@ -66,6 +67,13 @@ const sidebarGroups = [
       { label: 'داشبورد', to: '/dashboard' },
       { label: 'پروفایل', to: '/dashboard/profile' },
       { label: 'تنظیمات', to: '/dashboard/settings' },
+    ],
+  },
+  {
+    title: 'حسابداری',
+    key: 'accounting',
+    items: [
+      { label: 'حساب های تفصیلی', to: '/dashboard/accounting/detailLedger'},
     ],
   },
 ];

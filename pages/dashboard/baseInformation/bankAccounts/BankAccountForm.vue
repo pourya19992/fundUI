@@ -69,9 +69,9 @@ import type { CustomerBankAccount } from '@/services/baseInformation/customerSer
 
 // Define a type for the form that ensures bankAccount is always defined
 interface BankAccountFormData {
-  id: number;
-  customerId: string;
-  bankAccount: BankAccount;
+id: number;
+customerId: string;
+bankAccount: BankAccount;
 }
 
 const props = defineProps<{

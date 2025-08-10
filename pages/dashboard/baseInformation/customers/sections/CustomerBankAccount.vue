@@ -26,7 +26,16 @@
                   class="w-full text-base text-right"
                   @edit="handleEdit"
                   @delete="handleDelete"
-                />
+                >
+                  <template #additional-actions="{ item }">
+                    <BaseTooltip label="تنظیم به عنوان حساب پیش‌فرض">
+                    <SetDefaultIcon
+                      @click="handleSetDefault(item)"
+                      class="cursor-pointer hover:opacity-80 transition-opacity"
+                    />
+                    </BaseTooltip>
+                  </template>
+                </BaseTable>
             </div>
             <div v-else class="mb-4 text-gray-500 text-center">حسابی ثبت نشده است.</div>
             <div class="flex justify-end mt-4">
@@ -54,6 +63,7 @@ import { createBankService } from '@/services/administration/bankService';
 import BaseTable from '@/components/base/BaseTable.vue';
 import BankAccountForm from '@/pages/dashboard/baseInformation/bankAccounts/BankAccountForm.vue';
 import CustomerBankAccountIcon from '@/components/icons/CustomerBankAccountIcon.vue';
+import SetDefaultIcon from '@/components/icons/SetDefaultIcon.vue';
 
 const props = defineProps<{ customer: CustomerResponseDto }>();
 
@@ -110,7 +120,8 @@ const bankAccountColumns = [
   { label: 'نوع حساب', key: 'bankAccountType.name' },
   { label: 'شماره حساب', key: 'accountNumber' },
   { label: 'شماره شبا', key: 'shabaNumber' },
-  { label: 'فعال', key: 'isActiveLabel' }
+  { label: 'وضعیت', key: 'isActiveLabel' },
+  { label: 'سود سالانه', key: 'annualinterest' },
 ];
 
 const customerBankAccountsWithLabel = computed(() =>
@@ -121,7 +132,8 @@ const customerBankAccountsWithLabel = computed(() =>
     bank: acc.bankAccount?.bank ?? {},
     bankAccountType: acc.bankAccount?.bankAccountType ?? {},
     isActiveLabel: acc.bankAccount?.isActive ? 'بله' : 'خیر',
-    id: acc.id
+    id: acc.id,
+    annualinterest: acc.bankAccount?.annualinterest ?? 0
   }))
 );
 
@@ -198,6 +210,21 @@ const handleDelete = async (customerBankAccount: CustomerBankAccount) => {
       notify({ description: 'خطا در حذف حساب', status: 'error' });
     } finally {
       isLoading.value = false;
+    }
+  }
+};
+
+const handleSetDefault = async (customerBankAccount: CustomerBankAccount) => {
+  if (confirm('آیا از تنظیم این حساب به عنوان حساب پیش‌فرض اطمینان دارید؟')) {
+    isUpdating.value = true;
+    try {
+      await customerService.setDefaultBankAccount(props.customer.id, customerBankAccount?.id || 0);
+      notify({ description: 'حساب پیش‌فرض با موفقیت تنظیم شد', status: 'success' });
+      await loadData();
+    } catch (error: any) {
+      notify({ description: error.message || 'خطا در تنظیم حساب پیش‌فرض', status: 'error' });
+    } finally {
+      isUpdating.value = false;
     }
   }
 };

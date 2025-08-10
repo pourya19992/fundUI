@@ -1,19 +1,25 @@
-import axios from 'axios';
+import { createBaseService } from '../baseService';
+import type { PagedResponse } from '../baseService';
+
+const API_URL = '/api/v1/accounting/detailLedger';
 
 export interface DetailLedger {
   id: number;
   name: string;
   code: string;
-  detailLedgerType: {
-    id: number;
+  detailLedgerType?: DetailLedgerType;
+  isActive: boolean;
+}
+
+export interface DetailLedgerType {
+  id?: number;
     name: string;
     accountNature: {
       id: number;
       natureAccountName: string;
     };
-  };
-  isActive: boolean;
-}
+};
+
 
 export interface DetailLedgerDto {
   id?: number;
@@ -23,58 +29,81 @@ export interface DetailLedgerDto {
   isActive: boolean;
 }
 
-export const createDetailLedgerService = (baseURL: string) => {
-  const apiClient = axios.create({
-    baseURL,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-TenantId': '90001'
-    }
-  });
+interface ApiResponse {
+  message: string;
+  data?: any;
+}
 
-  apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+
+export const createDetailLedgerService = (baseURL: string) => {
+  const { apiClient, handleError } = createBaseService(baseURL);
 
   return {
-    async getDetailLedgerList(ledgerId?: number): Promise<DetailLedger[]> {
+    async getDetailLedgerList() {
       try {
-        const url = ledgerId 
-          ? `/api/v1/accounting/detailLedger/${ledgerId}`
-          : '/api/v1/accounting/detailLedger';
-        const response = await apiClient.get(url);
+        const response = await apiClient.get(`${API_URL}`);
         return response.data;
       } catch (error) {
-        throw error;
+        return handleError(error);
       }
     },
 
-    async addDetailLedger(ledger: DetailLedgerDto): Promise<void> {
+    async getDetailLedgerById(id: number) {
       try {
-        await apiClient.post('/api/v1/accounting/detailLedger/add', ledger);
+        const response = await apiClient.get(`${API_URL}/${id}`);
+        return response.data;
+      } catch (error) {
+        return handleError(error);
+      }
+    },
+
+
+    async addDetailLedger(detailLedger: DetailLedgerDto): Promise<ApiResponse> {
+      try {
+        const response = await apiClient.post(`${API_URL}/add`, detailLedger);
+        return {
+          message: response.data.message || 'حساب تفصیلی با موفقیت اضافه شد'
+        };
+      } catch (error) {
+        return handleError(error);
+      }
+    },
+
+    async updateDetailLedger(detailLedger: DetailLedgerDto): Promise<ApiResponse> {
+      try {
+        const response = await apiClient.put(`${API_URL}/edit`, detailLedger);
+        return {
+          message: response.data.message || 'حساب تفصیلی با موفقیت ویرایش شد'
+        };
+      } catch (error) {
+        return handleError(error);
+      }
+    },
+
+    async deleteDetailLedger(detailLedgerId: number): Promise<void> {
+      try {
+        await apiClient.delete(`${API_URL}/remove/${detailLedgerId}`);
       } catch (error) {
         throw error;
       }
     },
 
-    async updateDetailLedger(ledger: DetailLedgerDto): Promise<void> {
+    async getDetailLedgerTypeList() {
       try {
-        await apiClient.put('/api/v1/accounting/detailLedger/edit', ledger);
+        const response = await apiClient.get(`${API_URL}/type`);
+        return response.data;
       } catch (error) {
-        throw error;
+        return handleError(error);
       }
     },
 
-    async deleteDetailLedger(ledgerId: number): Promise<void> {
+    async getDetailLedgerTypeById(id: number) {
       try {
-        await apiClient.delete(`/api/v1/accounting/detailLedger/remove/${ledgerId}`);
+        const response = await apiClient.get(`${API_URL}/type/${id}`);
+        return response.data;
       } catch (error) {
-        throw error;
+        return handleError(error);
       }
-    }
+    },
   };
-}; 
+};

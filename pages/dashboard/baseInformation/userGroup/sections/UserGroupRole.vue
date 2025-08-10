@@ -67,8 +67,6 @@ const props = defineProps<{
 userGroup: UserGroup;
 }>();
 
-
-const config = useRuntimeConfig();
 const userService = createUserGroupService(BASE_URL);
 const roleService = createRoleService(BASE_URL);
 

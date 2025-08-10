@@ -2,7 +2,6 @@ import { defineStore } from 'pinia';
 import type { Role } from '@/services/baseInformation/roleService';
 import { createRoleService } from '@/services/baseInformation/roleService';
 
-const config = useRuntimeConfig();
 const roleService = createRoleService(BASE_URL);
 
 
